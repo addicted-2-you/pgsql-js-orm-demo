@@ -4,7 +4,9 @@ import Comment from "./models/comment";
 import PostReaction from "./models/post-reaction";
 import Post from "./models/post";
 import UserAvatar from "./models/user-avatar";
+import UserRole from "./models/user-role";
 import User from "./models/user";
+import M2MUserRole from "./models/m2m-user-role";
 
 const sequelize = new Sequelize({
   database: process.env.DB_NAME,
@@ -12,7 +14,15 @@ const sequelize = new Sequelize({
   password: process.env.DB_PASSWORD,
   host: "localhost",
   dialect: "postgres",
-  models: [Comment, PostReaction, Post, UserAvatar, User],
+  models: [
+    Comment,
+    M2MUserRole,
+    PostReaction,
+    Post,
+    UserAvatar,
+    UserRole,
+    User,
+  ],
 });
 
 export default sequelize;

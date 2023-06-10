@@ -3,21 +3,19 @@ import {
   Table,
   Column,
   DataType,
-  HasMany,
   BelongsToMany,
 } from "sequelize-typescript";
 
-import Post from "./post";
-import UserRole from "./user-role";
+import User from "./user";
 import M2MUserRole from "./m2m-user-role";
 
 @Table({
-  tableName: "users",
+  tableName: "user_roles",
   timestamps: true,
   paranoid: true,
   underscored: true,
 })
-class User extends Model<User> {
+class UserRole extends Model<UserRole> {
   @Column({
     primaryKey: true,
     defaultValue: DataType.UUIDV4,
@@ -29,7 +27,7 @@ class User extends Model<User> {
     allowNull: false,
     type: DataType.STRING(255),
   })
-  username: string;
+  name: string;
 
   @Column({
     field: "created_at",
@@ -52,11 +50,8 @@ class User extends Model<User> {
   })
   deletedAt: Date;
 
-  @HasMany(() => Post)
-  posts: Post[];
-
-  @BelongsToMany(() => UserRole, () => M2MUserRole)
-  roles: UserRole[];
+  @BelongsToMany(() => User, () => M2MUserRole)
+  users: User[];
 }
 
-export default User;
+export default UserRole;
