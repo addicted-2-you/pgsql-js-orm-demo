@@ -11,3 +11,31 @@ export const getUsers = async () => {
     return null;
   }
 };
+
+export const getUserData = async (username: string) => {
+  try {
+    const user = await prisma.users.findFirstOrThrow({
+      where: {
+        username,
+      },
+
+      include: {
+        posts: true,
+
+        comments: true,
+
+        reactions_to_posts: true,
+
+        M2M_UserRole: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+    return user;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
