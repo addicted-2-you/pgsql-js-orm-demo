@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "nodemon ./src/index.ts"
   },
+  "prisma": {
+    "seed": "ts-node ./prisma/seed.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -13,6 +16,8 @@
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "dotenv": "^16.1.4"
+    "@prisma/client": "^4.15.0",
+    "dotenv": "^16.1.4",
+    "prisma": "^4.15.0"
   }
 }

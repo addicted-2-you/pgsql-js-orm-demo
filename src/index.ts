@@ -1,5 +1,27 @@
 import dotenv from "dotenv";
 
+// services
+import { getComments } from "./services/comment-services";
+import { getPostsReactions } from "./services/post-reaction-services";
+import { getPosts } from "./services/post-services";
+import { getUserData, getUsers } from "./services/user-services";
+import { getUserAvatars } from "./services/user-avatar-services";
+
 dotenv.config();
 
-console.log(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD);
+(async () => {
+  // const comments = await getComments();
+  // const reactions = await getPostsReactions();
+  // const posts = await getPosts();
+  // const userAvatars = await getUserAvatars();
+  // const users = await getUsers();
+
+  // console.log(comments);
+  // console.log(reactions);
+  // console.log(posts);
+  // console.log(userAvatars);
+  // console.log(users);
+
+  const userData = await getUserData("john_doe");
+  console.log(userData);
+})();

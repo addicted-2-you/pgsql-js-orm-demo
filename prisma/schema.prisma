@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+model SequelizeMeta {
+  name String @id @db.VarChar(255)
+}
+
+model comments {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  post_id    String    @db.Uuid
+  user_id    String    @db.Uuid
+  content    String?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
+  posts      posts     @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model posts {
+  id                 String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id            String               @db.Uuid
+  title              String               @db.VarChar(255)
+  content            String?
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  deleted_at         DateTime?            @db.Timestamp(6)
+  comments           comments[]
+  users              users                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reactions_to_posts reactions_to_posts[]
+}
+
+model reactions_to_posts {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id       String    @db.Uuid
+  post_id       String    @db.Uuid
+  reaction_type String    @db.VarChar(50)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at    DateTime? @db.Timestamp(6)
+  posts         posts     @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users         users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_avatars {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String?   @unique @db.Uuid
+  avatar_url String    @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_roles {
+  id           String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name         String         @db.VarChar(255)
+  created_at   DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at   DateTime?      @default(now()) @db.Timestamp(6)
+  deleted_at   DateTime?      @db.Timestamp(6)
+  // users        users[]        @relation("M2M_UserRole")
+  usersId      String?        @db.Uuid
+  M2M_UserRole M2M_UserRole[]
+}
+
+model M2M_UserRole {
+  id        String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user      users      @relation(fields: [userId], references: [id])
+  userId    String     @db.Uuid
+  role      user_roles @relation(fields: [roleId], references: [id])
+  roleId    String     @db.Uuid
+  createdAt DateTime   @default(now())
+}
+
+model users {
+  id                 String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username           String               @db.VarChar(255)
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  deleted_at         DateTime?            @db.Timestamp(6)
+  comments           comments[]
+  posts              posts[]
+  reactions_to_posts reactions_to_posts[]
+  user_avatars       user_avatars?
+  // user_roles         user_roles[]         @relation("M2M_UserRole")
+  M2M_UserRole       M2M_UserRole[]
+}
