@@ -3,16 +3,23 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "nodemon ./src/index.ts"
+    "dev": "nodemon ./src/index.ts",
+    "start": "ts-node src/index.ts",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^2.0.22",
-    "ts-node": "^10.9.1"
+    "ts-node": "10.7.0",
+    "@types/node": "^16.11.10",
+    "typescript": "4.5.2"
   },
   "dependencies": {
-    "dotenv": "^16.1.4"
+    "dotenv": "^16.1.4",
+    "pg": "^8.4.0",
+    "typeorm": "0.3.16",
+    "reflect-metadata": "^0.1.13"
   }
 }
