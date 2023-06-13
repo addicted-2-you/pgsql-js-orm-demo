@@ -2,4 +2,18 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-console.log(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD);
+import { AppDataSource } from "./data-source";
+
+// services
+import { getUsers } from "./services/user-services";
+
+(async () => {
+  try {
+    await AppDataSource.initialize();
+
+    const users = await getUsers();
+    console.log(users);
+  } catch (error) {
+    console.error(error);
+  }
+})();
