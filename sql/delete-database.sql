@@ -1,5 +1,11 @@
-DROP TABLE user_avatars;
-DROP TABLE comments;
-DROP TABLE reactions_to_posts;
-DROP TABLE posts;
-DROP TABLE users;
+DROP TABLE IF EXISTS user_avatars;
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS reactions_to_posts;
+DROP TABLE IF EXISTS reactions;
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS permissions;
+DROP TABLE IF EXISTS roles;
+DROP TABLE IF EXISTS role_permissions;
+DROP TABLE IF EXISTS user_roles;
+DROP TABLE IF EXISTS user_permissions;

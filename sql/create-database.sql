@@ -4,9 +4,21 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE users (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   deleted_at TIMESTAMP
+);
+
+-- Create the 'user_avatars' table (one-to-one relationship)
+CREATE TABLE user_avatars (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID UNIQUE,
+  avatar_url VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- Create the 'posts' table
@@ -34,26 +46,59 @@ CREATE TABLE comments (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- Create the 'reactions' table (many-to-many relationship)
+CREATE TABLE reactions (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP
+);
+
 -- Create the 'reactions_to_posts' table (many-to-many relationship)
 CREATE TABLE reactions_to_posts (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID NOT NULL,
   post_id UUID NOT NULL,
-  reaction_type VARCHAR(50) NOT NULL,
+  reaction_id UUID NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   deleted_at TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (post_id) REFERENCES posts(id)
+  FOREIGN KEY (post_id) REFERENCES posts(id),
+  FOREIGN KEY (reaction_id) REFERENCES reactions(id)
 );
 
--- Create the 'user_avatars' table (one-to-one relationship)
-CREATE TABLE user_avatars (
+CREATE TABLE permissions (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id UUID UNIQUE,
-  avatar_url VARCHAR(255) NOT NULL,
+  title VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  deleted_at TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  deleted_at TIMESTAMP
+);
+
+CREATE TABLE roles (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP
+);
+
+CREATE TABLE role_permissions (
+  role_id UUID NOT NULL,
+  permission_id UUID NOT NULL,
+  PRIMARY KEY (role_id, permission_id)
+);
+
+CREATE TABLE user_roles (
+  user_id UUID NOT NULL,
+  role_id UUID NOT NULL,
+  PRIMARY KEY (user_id, role_id)
+);
+
+CREATE TABLE user_permissions (
+  user_id UUID NOT NULL,
+  permission_id UUID NOT NULL,
+  PRIMARY KEY (user_id, permission_id)
 );
