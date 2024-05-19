@@ -1,6 +1,4 @@
-const dotenv = require("dotenv");
-const { Client } = require("pg");
-
+const { client } = require("./client");
 const {
   createUsers,
   createPosts,
@@ -27,17 +25,7 @@ const {
   generateInsertReactionsSQL,
   generateInsertReactionsToPosts,
 } = require("./generate-sql");
-
-dotenv.config();
-
-// Configure the PostgreSQL client
-const client = new Client({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-});
+const { selectRoles, selectPermissions } = require("./services");
 
 const USERS_NUM = 1000;
 const POSTS_NUM = 2000;
@@ -50,11 +38,25 @@ async function insertData() {
   const users = await createUsers(USERS_NUM);
   const avatars = await createUserAvatars(users);
 
-  const permissions = await createPermissions();
-  const roles = await createRoles();
-  const rolePermissions = await createRolePermissions(roles, permissions);
-  const userRoles = await createUserRoles(users, roles);
-  const userPermissions = await createUserPermissions(users, roles);
+  let permissions = [];
+  let roles = [];
+  let rolePermissions = [];
+  let userRoles = [];
+  let userPermissions = [];
+
+  const existingRoles = await selectRoles();
+  if (existingRoles.length) {
+    const existingPermissions = await selectPermissions();
+
+    userRoles = await createUserRoles(users, existingRoles);
+    userPermissions = await createUserPermissions(users, existingPermissions);
+  } else {
+    permissions = await createPermissions();
+    roles = await createRoles();
+    rolePermissions = await createRolePermissions(roles, permissions);
+    userRoles = await createUserRoles(users, roles);
+    userPermissions = await createUserPermissions(users, permissions);
+  }
 
   const posts = await createPosts(users, POSTS_NUM);
   const comments = await createComments(posts, users, COMMENTS_NUM);
