@@ -15,7 +15,7 @@ export const authMiddleware = (
 
   jwt.verify(token, process.env.SECRET_JWT_KEY!, (err, user: any) => {
     if (err || !user?.uid) {
-      return res.sendStatus(403);
+      return res.sendStatus(401);
     }
 
     req.uid = user.uid;

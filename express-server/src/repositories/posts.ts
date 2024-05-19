@@ -1,6 +1,20 @@
 import { pool } from "../client";
 import { UpdatePostPatch } from "../types/posts";
 
+export const findOne = async (id: string) => {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query("SELECT * FROM posts WHERE id = $1", [
+      id,
+    ]);
+
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+};
+
 export const create = async (
   userId: string,
   title: string,
