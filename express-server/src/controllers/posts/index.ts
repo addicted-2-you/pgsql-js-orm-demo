@@ -8,14 +8,16 @@ import { unarchive } from "./unarchive";
 import { archive } from "./archive";
 import { destroy } from "./destroy";
 
+import { authMiddleware } from "../../middlewares/auth";
+
 const postsRouter = express.Router();
 
 postsRouter.get("/", list);
 postsRouter.get("/:id", findOne);
-postsRouter.post("/", create);
-postsRouter.patch("/:id", update);
-postsRouter.put("/:id/unarchive", unarchive);
-postsRouter.delete("/:id/archive", archive);
-postsRouter.delete("/:id", destroy);
+postsRouter.post("/", [authMiddleware], create);
+postsRouter.patch("/:id", [authMiddleware], update);
+postsRouter.put("/:id/unarchive", [authMiddleware], unarchive);
+postsRouter.delete("/:id/archive", [authMiddleware], archive);
+postsRouter.delete("/:id", [authMiddleware], destroy);
 
 export { postsRouter };

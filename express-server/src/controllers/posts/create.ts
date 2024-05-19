@@ -4,8 +4,8 @@ import { createPost } from "../../services/posts";
 
 export const create = async (req: Request, res: Response) => {
   try {
-    const { userId, title, content } = req.body;
-    const result = await createPost(userId, title, content);
+    const { title, content } = req.body;
+    const result = await createPost(req.uid, title, content);
     return res.send({ data: result });
   } catch (error) {
     console.log(error);
