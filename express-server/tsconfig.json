@@ -5,5 +5,7 @@
   },
   "compilerOptions": {
     "typeRoots": ["./node_modules/@types", "./global.d.ts"]
-  }
+  },
+  "include": ["./src/**/*.ts"],
+  "exclude": ["./node_modules"]
 }
