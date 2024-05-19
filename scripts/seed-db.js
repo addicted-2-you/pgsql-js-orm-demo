@@ -68,39 +68,21 @@ async function insertData() {
     REACTIONS_TO_POSTS_NUM
   );
 
-  const usersPromise = client.query(generateInsertUsersSQL(users));
-  const avatarsPromise = client.query(generateInsertUserAvatarsSQL(avatars));
-  const permissionsPromise = client.query(
-    generateInsertPermissionsSQL(permissions)
+  await client.query(
+    [
+      generateInsertUsersSQL(users),
+      generateInsertUserAvatarsSQL(avatars),
+      generateInsertPermissionsSQL(permissions),
+      generateInsertRolesSQL(roles),
+      generateInsertRolePermissionsSQL(rolePermissions),
+      generateInsertUserRolesSQL(userRoles),
+      generateInsertUserPermissionsSQL(userPermissions),
+      generateInsertPostsSQL(posts),
+      generateInsertPostCommentsSQL(comments),
+      generateInsertReactionsSQL(reactions),
+      generateInsertReactionsToPosts(reactionsToPosts),
+    ].join(";\n")
   );
-  const rolesPromise = client.query(generateInsertRolesSQL(roles));
-  const rolePermissionsPromise = client.query(
-    generateInsertRolePermissionsSQL(rolePermissions)
-  );
-  const userRolesPromise = client.query(generateInsertUserRolesSQL(userRoles));
-  const userPermissionsPromise = client.query(
-    generateInsertUserPermissionsSQL(userPermissions)
-  );
-  const postPromise = client.query(generateInsertPostsSQL(posts));
-  const commentPromise = client.query(generateInsertPostCommentsSQL(comments));
-  const reactionPromise = client.query(generateInsertReactionsSQL(reactions));
-  const reactionToPostsPromise = client.query(
-    generateInsertReactionsToPosts(reactionsToPosts)
-  );
-
-  await Promise.all([
-    usersPromise.then(() => console.log("inserted users")),
-    avatarsPromise.then(() => console.log("inserted avatars")),
-    permissionsPromise.then(() => console.log("inserted permissions")),
-    rolesPromise.then(() => console.log("inserted roles")),
-    rolePermissionsPromise.then(() => console.log("inserted role permissions")),
-    userRolesPromise.then(() => console.log("inserted user roles")),
-    userPermissionsPromise.then(() => console.log("inserted user permissions")),
-    postPromise.then(() => console.log("inserted posts")),
-    commentPromise.then(() => console.log("inserted comments")),
-    reactionPromise.then(() => console.log("inserted reactions")),
-    reactionToPostsPromise.then(() => console.log("inserted reactionsToPosts")),
-  ]);
 
   await client.end();
 }
