@@ -1,11 +1,33 @@
 import { pool } from "../client";
 import { UpdatePostPatch } from "../types/posts";
 
-export const list = async () => {
+export const list = async (orderBy?: string) => {
   const client = await pool.connect();
 
   try {
-    const result = await client.query("SELECT * FROM posts");
+    const result = await client.query("SELECT * FROM posts ORDER BY $1 DESC", [
+      orderBy || "created_at",
+    ]);
+
+    return result.rows;
+  } finally {
+    client.release();
+  }
+};
+
+export const listPage = async (
+  limit: number,
+  offset: number,
+  orderBy?: string
+) => {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      "SELECT * FROM posts ORDER BY $1 DESC LIMIT $2 OFFSET $3",
+      [orderBy || "created_at", limit, offset]
+    );
+
     return result.rows;
   } finally {
     client.release();
