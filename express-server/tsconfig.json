@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "ts-node": {
+    "files": true
+  },
+  "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "./global.d.ts"]
+  },
+  "exclude": ["./node_modules"]
+}
