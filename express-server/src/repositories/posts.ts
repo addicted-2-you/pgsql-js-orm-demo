@@ -1,14 +1,21 @@
 import { pool } from "../client";
 import { UpdatePostPatch } from "../types/posts";
 
-export const list = async (orderBy?: string) => {
+export const list = async (orderBy: string, search?: string) => {
   const client = await pool.connect();
 
   try {
-    const result = await client.query("SELECT * FROM posts ORDER BY $1 DESC", [
-      orderBy || "created_at",
-    ]);
+    let query = "SELECT * FROM posts";
+    const queryParams: (string | number)[] = [];
 
+    if (search) {
+      query += " WHERE title ILIKE $1 OR content ILIKE $1";
+      queryParams.push(`%${search}%`);
+    }
+
+    query += ` ORDER BY ${orderBy || "created_at"} DESC`;
+
+    const result = await client.query(query, queryParams);
     return result.rows;
   } finally {
     client.release();
@@ -18,16 +25,24 @@ export const list = async (orderBy?: string) => {
 export const listPage = async (
   limit: number,
   offset: number,
-  orderBy?: string
+  orderBy: string,
+  search?: string
 ) => {
   const client = await pool.connect();
 
   try {
-    const result = await client.query(
-      "SELECT * FROM posts ORDER BY $1 DESC LIMIT $2 OFFSET $3",
-      [orderBy || "created_at", limit, offset]
-    );
+    let query = "SELECT * FROM posts";
+    const queryParams: (string | number)[] = [];
 
+    if (search) {
+      query += " WHERE title ILIKE $1 OR content ILIKE $1";
+      queryParams.push(`%${search}%`);
+    }
+
+    query += ` ORDER BY ${orderBy || "created_at"} DESC LIMIT $2 OFFSET $3`;
+    queryParams.push(limit, offset);
+
+    const result = await client.query(query, queryParams);
     return result.rows;
   } finally {
     client.release();

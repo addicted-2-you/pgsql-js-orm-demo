@@ -15,9 +15,14 @@ export const list = async (req: Request, res: Response) => {
 
     let posts = [];
     if (req.query.page && req.query.limit) {
-      posts = await postsRepository.listPage(limit, offset, orderBy);
+      posts = await postsRepository.listPage(
+        limit,
+        offset,
+        orderBy,
+        req.query.search as string
+      );
     } else {
-      posts = await postsRepository.list(orderBy);
+      posts = await postsRepository.list(orderBy, req.query.search as string);
     }
 
     return res.send({ data: posts });
