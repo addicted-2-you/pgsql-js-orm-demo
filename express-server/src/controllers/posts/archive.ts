@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+
 import { archivePost } from "../../services/posts";
 
 export const archive = async (req: Request, res: Response) => {

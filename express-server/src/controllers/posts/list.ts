@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
 
-import { pool } from "../../client";
+import * as postsRepository from "../../repositories/posts";
 
 export const list = async (req: Request, res: Response) => {
-  const client = await pool.connect();
-  const users = await client.query("select * from posts");
-  client.release();
-  return res.send(users.rows);
+  try {
+    const users = await postsRepository.list();
+    return res.send({ data: users });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ error });
+  }
 };
