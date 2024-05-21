@@ -88,17 +88,24 @@ CREATE TABLE roles (
 CREATE TABLE role_permissions (
   role_id UUID NOT NULL,
   permission_id UUID NOT NULL,
-  PRIMARY KEY (role_id, permission_id)
+  PRIMARY KEY (role_id, permission_id),
+  FOREIGN KEY (role_id) REFERENCES roles(id),
+  FOREIGN KEY (permission_id) REFERENCES permissions(id)
+  
 );
 
 CREATE TABLE user_roles (
   user_id UUID NOT NULL,
   role_id UUID NOT NULL,
-  PRIMARY KEY (user_id, role_id)
+  PRIMARY KEY (user_id, role_id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
 CREATE TABLE user_permissions (
   user_id UUID NOT NULL,
   permission_id UUID NOT NULL,
-  PRIMARY KEY (user_id, permission_id)
+  PRIMARY KEY (user_id, permission_id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (permission_id) REFERENCES permissions(id)
 );
