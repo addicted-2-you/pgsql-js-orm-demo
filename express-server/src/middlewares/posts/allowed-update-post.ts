@@ -14,7 +14,7 @@ export const allowedUpdatePostMiddleware = async (
   );
 
   if (
-    post.user_id !== req.uid &&
+    post?.user_id !== req.uid &&
     !userWithPermissions?.find(
       (user) => user.role === "Admin" || user.role === "Super Admin"
     )

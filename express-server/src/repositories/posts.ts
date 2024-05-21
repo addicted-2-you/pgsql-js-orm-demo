@@ -1,6 +1,10 @@
 import { pool } from "../client";
 import { UpdatePostPatch } from "../types/posts";
 
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
 export const list = async (orderBy: string, search?: string) => {
   const client = await pool.connect();
 
@@ -50,16 +54,16 @@ export const listPage = async (
 };
 
 export const findOne = async (id: string) => {
-  const client = await pool.connect();
-
   try {
-    const result = await client.query("SELECT * FROM posts WHERE id = $1", [
-      id,
-    ]);
+    const result = await prisma.posts.findUnique({
+      where: {
+        id: id,
+      },
+    });
 
-    return result.rows[0];
+    return result;
   } finally {
-    client.release();
+    await prisma.$disconnect;
   }
 };
 
@@ -69,7 +73,7 @@ export const create = async (
   content: string
 ) => {
   const client = await pool.connect();
-
+  console.log(userId, title, content);
   try {
     const result = await client.query(
       "INSERT INTO posts (user_id, title, content) VALUES ($1, $2, $3) RETURNING *",
