@@ -1,4 +1,4 @@
-const { client } = require("./client");
+const { client } = require("../client");
 
 const selectRoles = async () => {
   const result = await client.query("SELECT * from roles");

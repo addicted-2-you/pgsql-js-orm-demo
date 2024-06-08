@@ -45,6 +45,11 @@ const ROLES_PERMISSIONS = {
   Viewer: [],
 };
 
+const APPROXIMATE_FRIENDS_COUNT = 100;
+const FRIENDS_COUNT_DISPERSION = 50;
+
+const FRIEND_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
+
 const createPermissions = async () => {
   const permissions = [];
 
@@ -192,6 +197,45 @@ async function createReactionsToPosts(posts, users, reactions, n) {
   return reactionsToPosts;
 }
 
+async function createFriendRequests(users) {
+  const friendRequsts = [];
+
+  users.forEach((user) => {
+    const dispersionDirection = Math.random() > 0.5 ? 1 : -1;
+    for (
+      let i = 0;
+      i <=
+      APPROXIMATE_FRIENDS_COUNT +
+        Math.floor(
+          FRIENDS_COUNT_DISPERSION * Math.random() * dispersionDirection
+        );
+      i += 1
+    ) {
+      const randomUser = users[Math.floor(Math.random() * users.length)];
+      if (
+        user.id !== randomUser.id &&
+        !friendRequsts.find(
+          (fr) =>
+            (fr.requesterId === user.id && fr.receiverId === randomUser.id) ||
+            (fr.requesterId === randomUser.id && fr.receiverId === user.id)
+        )
+      ) {
+        friendRequsts.push({
+          id: faker.string.uuid(),
+          requesterId: user.id,
+          receiverId: randomUser.id,
+          status:
+            FRIEND_REQUEST_STATUSES[
+              Math.floor(Math.random() * FRIEND_REQUEST_STATUSES.length)
+            ],
+        });
+      }
+    }
+  });
+
+  return friendRequsts;
+}
+
 module.exports = {
   createPermissions,
   createRoles,
@@ -205,4 +249,5 @@ module.exports = {
   createReactions,
   createUserAvatars,
   createReactionsToPosts,
+  createFriendRequests,
 };

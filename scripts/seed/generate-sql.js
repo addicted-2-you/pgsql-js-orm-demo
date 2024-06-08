@@ -78,11 +78,19 @@ const generateInsertReactionsSQL = (reactions) =>
     )
     .join(";\n");
 
-const generateInsertReactionsToPosts = (reactions) =>
+const generateInsertReactionsToPostsSQL = (reactions) =>
   reactions
     .map(
       (rtp) =>
         `INSERT INTO reactions_to_posts (id, user_id, post_id, reaction_id) VALUES ('${rtp.id}', '${rtp.user_id}','${rtp.post_id}','${rtp.reaction_id}')`
+    )
+    .join(";\n");
+
+const generateFriendRequestsSQL = (friendRequests) =>
+  friendRequests
+    .map(
+      (fr) =>
+        `INSERT INTO friend_requests (id, requester_id, receiver_id, status) VALUES ('${fr.id}', '${fr.requesterId}', '${fr.receiverId}', '${fr.status}')`
     )
     .join(";\n");
 
@@ -97,5 +105,6 @@ module.exports = {
   generateInsertPostsSQL,
   generateInsertPostCommentsSQL,
   generateInsertReactionsSQL,
-  generateInsertReactionsToPosts,
+  generateInsertReactionsToPostsSQL,
+  generateFriendRequestsSQL,
 };

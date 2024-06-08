@@ -1,4 +1,4 @@
-const { client } = require("./client");
+const { client } = require("../client");
 const {
   createUsers,
   createPosts,
@@ -11,6 +11,7 @@ const {
   createRolePermissions,
   createUserRoles,
   createRoles,
+  createFriendRequests,
 } = require("./generate-data");
 const {
   generateInsertUsersSQL,
@@ -23,7 +24,8 @@ const {
   generateInsertPostsSQL,
   generateInsertPostCommentsSQL,
   generateInsertReactionsSQL,
-  generateInsertReactionsToPosts,
+  generateInsertReactionsToPostsSQL,
+  generateFriendRequestsSQL,
 } = require("./generate-sql");
 const { selectRoles, selectPermissions } = require("./services");
 
@@ -47,7 +49,6 @@ async function insertData() {
   const existingRoles = await selectRoles();
   if (existingRoles.length) {
     const existingPermissions = await selectPermissions();
-
     userRoles = await createUserRoles(users, existingRoles);
     userPermissions = await createUserPermissions(users, existingPermissions);
   } else {
@@ -68,6 +69,8 @@ async function insertData() {
     REACTIONS_TO_POSTS_NUM
   );
 
+  const friendRequests = await createFriendRequests(users);
+
   await client.query(
     [
       generateInsertUsersSQL(users),
@@ -80,7 +83,8 @@ async function insertData() {
       generateInsertPostsSQL(posts),
       generateInsertPostCommentsSQL(comments),
       generateInsertReactionsSQL(reactions),
-      generateInsertReactionsToPosts(reactionsToPosts),
+      generateInsertReactionsToPostsSQL(reactionsToPosts),
+      generateFriendRequestsSQL(friendRequests),
     ].join(";\n")
   );
 

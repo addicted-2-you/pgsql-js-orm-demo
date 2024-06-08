@@ -109,3 +109,15 @@ CREATE TABLE user_permissions (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE friend_requests (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  requester_id UUID NOT NULL,
+  receiver_id UUID NOT NULL,
+  status VARCHAR(63) NOT NULL CHECK (status IN ('pending', 'accepted', 'rejected')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  UNIQUE (requester_id, receiver_id)
+);
