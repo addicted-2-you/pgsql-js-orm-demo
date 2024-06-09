@@ -14,6 +14,22 @@ const generateInsertUserAvatarsSQL = (userAvatars) =>
     )
     .join(";\n");
 
+const generateInsertUserEmailsSQL = (userEmails) =>
+  userEmails
+    .map(
+      (ue) =>
+        `INSERT INTO user_emails (id, user_id, email, is_verified) VALUES ('${ue.id}', '${ue.userId}', '${ue.email}', '${ue.isVerified}')`
+    )
+    .join(";\n");
+
+const generateInsertUserPhonesSQL = (userPhones) =>
+  userPhones
+    .map(
+      (up) =>
+        `INSERT INTO user_phones (id, user_id, phone, is_verified) VALUES ('${up.id}', '${up.userId}', '${up.phone}', '${up.isVerified}')`
+    )
+    .join(";\n");
+
 const generateInsertPermissionsSQL = (permissions) =>
   permissions
     .map(
@@ -118,6 +134,8 @@ const generateMessagesSQL = (messages) =>
 module.exports = {
   generateInsertUsersSQL,
   generateInsertUserAvatarsSQL,
+  generateInsertUserEmailsSQL,
+  generateInsertUserPhonesSQL,
   generateInsertPermissionsSQL,
   generateInsertRolesSQL,
   generateInsertRolePermissionsSQL,

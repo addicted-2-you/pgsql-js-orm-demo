@@ -55,7 +55,7 @@ const CHATS_COUNT_DISPERSION = 1;
 
 const APPROXIMATE_CHAT_MEMBERS_COUNT = 10;
 
-const APPROXIMATE_MESSAGES_COUNT = 10;
+const APPROXIMATE_MESSAGES_COUNT = 100;
 
 const FRIEND_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
 
@@ -140,6 +140,48 @@ async function createUserAvatars(users) {
     });
   }
   return avatars;
+}
+
+async function createUserEmails(users) {
+  const emails = [];
+
+  users.forEach((user) => {
+    const email = faker.internet.email();
+    if (!emails.find((e) => e.email === email)) {
+      // not all users have emails
+      if (Math.random() > 0.5) {
+        emails.push({
+          id: faker.string.uuid(),
+          userId: user.id,
+          email,
+          isVerified: Math.random() > 0.5,
+        });
+      }
+    }
+  });
+
+  return emails;
+}
+
+async function createUserPhones(users) {
+  const phones = [];
+
+  users.forEach((user) => {
+    const phone = faker.phone.number();
+    if (!phones.find((p) => p.phone === phone)) {
+      // not all users have phones
+      if (Math.random() > 0.5) {
+        phones.push({
+          id: faker.string.uuid(),
+          userId: user.id,
+          phone,
+          isVerified: Math.random() > 0.5,
+        });
+      }
+    }
+  });
+
+  return phones;
 }
 
 async function createPosts(users, n) {
@@ -344,6 +386,8 @@ module.exports = {
   createComments,
   createReactions,
   createUserAvatars,
+  createUserEmails,
+  createUserPhones,
   createReactionsToPosts,
   createFriendRequests,
   createChatting,
