@@ -94,6 +94,27 @@ const generateFriendRequestsSQL = (friendRequests) =>
     )
     .join(";\n");
 
+const generateChatsSQL = (chats) =>
+  chats
+    .map((c) => `INSERT INTO chats (id, name) VALUES ('${c.id}', '${c.name}')`)
+    .join(";\n");
+
+const generateChatMembersSQL = (chatMembers) =>
+  chatMembers
+    .map(
+      (cm) =>
+        `INSERT INTO chat_members (chat_id, user_id) VALUES ('${cm.chatId}', '${cm.userId}')`
+    )
+    .join(";\n");
+
+const generateMessagesSQL = (messages) =>
+  messages
+    .map(
+      (m) =>
+        `INSERT INTO messages (id, chat_id, sender_id, type, content, created_at) VALUES ('${m.id}', '${m.chatId}', '${m.senderId}', '${m.type}', '${m.content}', '${m.createdAt}')`
+    )
+    .join(";\n");
+
 module.exports = {
   generateInsertUsersSQL,
   generateInsertUserAvatarsSQL,
@@ -107,4 +128,7 @@ module.exports = {
   generateInsertReactionsSQL,
   generateInsertReactionsToPostsSQL,
   generateFriendRequestsSQL,
+  generateChatsSQL,
+  generateChatMembersSQL,
+  generateMessagesSQL,
 };

@@ -1,6 +1,8 @@
 const { faker, ro } = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 
+const { arraysAreSame, sanitazeSqlString } = require("./utils");
+
 const POST_PERMISSION_TITLES = ["create_post", "delete_any_post"];
 
 const COMMENTS_PERMISSION_TITLES = ["create_comment", "delete_any_comment"];
@@ -47,6 +49,13 @@ const ROLES_PERMISSIONS = {
 
 const APPROXIMATE_FRIENDS_COUNT = 100;
 const FRIENDS_COUNT_DISPERSION = 50;
+
+const APPROXIMATE_CHATS_COUNT = 5;
+const CHATS_COUNT_DISPERSION = 1;
+
+const APPROXIMATE_CHAT_MEMBERS_COUNT = 10;
+
+const APPROXIMATE_MESSAGES_COUNT = 10;
 
 const FRIEND_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
 
@@ -110,12 +119,12 @@ const createUserPermissions = async () => [];
 async function createUsers(n) {
   const users = [];
   for (let i = 0; i < n; i++) {
-    const username = faker.internet.userName();
+    const username = sanitazeSqlString(faker.internet.userName());
 
     users.push({
       id: faker.string.uuid(),
       username,
-      password: await bcrypt.hash(username, 10),
+      password: await bcrypt.hash(username, 5),
     });
   }
   return users;
@@ -139,8 +148,8 @@ async function createPosts(users, n) {
     posts.push({
       id: faker.string.uuid(),
       user_id: faker.helpers.arrayElement(users).id,
-      title: faker.lorem.sentence(),
-      content: faker.lorem.paragraphs(),
+      title: sanitazeSqlString(faker.lorem.sentence()),
+      content: sanitazeSqlString(faker.lorem.paragraphs()),
     });
   }
   return posts;
@@ -153,7 +162,7 @@ async function createComments(posts, users, n) {
       id: faker.string.uuid(),
       post_id: faker.helpers.arrayElement(posts).id,
       user_id: faker.helpers.arrayElement(users).id,
-      content: faker.lorem.sentences(),
+      content: sanitazeSqlString(faker.lorem.sentences()),
     });
   }
   return comments;
@@ -206,9 +215,8 @@ async function createFriendRequests(users) {
       let i = 0;
       i <=
       APPROXIMATE_FRIENDS_COUNT +
-        Math.floor(
-          FRIENDS_COUNT_DISPERSION * Math.random() * dispersionDirection
-        );
+        Math.floor(FRIENDS_COUNT_DISPERSION * Math.random()) *
+          dispersionDirection;
       i += 1
     ) {
       const randomUser = users[Math.floor(Math.random() * users.length)];
@@ -236,6 +244,94 @@ async function createFriendRequests(users) {
   return friendRequsts;
 }
 
+async function createChatting(users) {
+  const chats = [];
+  const chatsMembers = {};
+  const chatsMessages = [];
+
+  users.forEach((user) => {
+    const dispersionDirection = Math.random() > 0.5 ? 1 : -1;
+
+    for (
+      let i = 0;
+      i <
+      APPROXIMATE_CHATS_COUNT +
+        Math.floor(CHATS_COUNT_DISPERSION * Math.random()) *
+          dispersionDirection;
+      i += 1
+    ) {
+      const chat = {
+        id: faker.string.uuid(),
+        name: sanitazeSqlString(faker.company.buzzNoun()),
+      };
+      const chatMembers = [user.id];
+      const messages = [];
+      for (
+        let j = 0;
+        j < Math.floor(APPROXIMATE_CHAT_MEMBERS_COUNT * Math.random());
+        j += 1
+      ) {
+        const randomUser = users[Math.floor(Math.random() * users.length)];
+        if (
+          user !== randomUser.id &&
+          !chatMembers.find((cm) => cm === randomUser.id)
+        ) {
+          chatMembers.push(randomUser.id);
+        }
+
+        if (
+          !Object.values(chatsMembers).find((ms) =>
+            arraysAreSame(chatMembers, ms)
+          )
+        ) {
+          for (
+            let k = 0;
+            k < Math.floor(APPROXIMATE_MESSAGES_COUNT * Math.random());
+            k += 1
+          ) {
+            messages.push({
+              id: faker.string.uuid(),
+              chatId: chat.id,
+              senderId:
+                chatMembers[Math.floor(Math.random() * chatMembers.length)],
+              type: "text",
+              content: sanitazeSqlString(
+                faker.word.words({ count: { min: 5, max: 15 } })
+              ),
+              createdAt: faker.date.recent().toISOString(),
+            });
+          }
+        }
+      }
+
+      if (messages.length) {
+        chats.push(chat);
+        chatsMembers[chat.id] = chatMembers;
+        chatsMessages.push(...messages);
+      }
+    }
+  });
+
+  return {
+    chats,
+    chatsMembers: Object.entries(chatsMembers).reduce(
+      (acc, [chatId, members]) => {
+        const flattenMembers = [];
+        members.forEach((userId) => {
+          flattenMembers.push({
+            chatId,
+            userId,
+          });
+        });
+
+        return acc.concat(flattenMembers);
+      },
+      []
+    ),
+    chatsMessages,
+  };
+}
+
 module.exports = {
   createPermissions,
   createRoles,
@@ -250,4 +346,5 @@ module.exports = {
   createUserAvatars,
   createReactionsToPosts,
   createFriendRequests,
+  createChatting,
 };

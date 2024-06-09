@@ -1,6 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create the 'users' table
 CREATE TABLE users (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
@@ -10,7 +9,6 @@ CREATE TABLE users (
   deleted_at TIMESTAMP
 );
 
--- Create the 'user_avatars' table (one-to-one relationship)
 CREATE TABLE user_avatars (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID UNIQUE,
@@ -21,7 +19,6 @@ CREATE TABLE user_avatars (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Create the 'posts' table
 CREATE TABLE posts (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID NOT NULL,
@@ -33,7 +30,6 @@ CREATE TABLE posts (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Create the 'comments' table (one-to-many relationship with 'posts')
 CREATE TABLE comments (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   post_id UUID NOT NULL,
@@ -46,7 +42,6 @@ CREATE TABLE comments (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Create the 'reactions' table (many-to-many relationship)
 CREATE TABLE reactions (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
@@ -55,7 +50,6 @@ CREATE TABLE reactions (
   deleted_at TIMESTAMP
 );
 
--- Create the 'reactions_to_posts' table (many-to-many relationship)
 CREATE TABLE reactions_to_posts (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID NOT NULL,
@@ -120,4 +114,34 @@ CREATE TABLE friend_requests (
   FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE (requester_id, receiver_id)
+);
+
+CREATE TABLE chats (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP
+);
+
+CREATE TABLE chat_members (
+  chat_id UUID NOT NULL,
+  user_id UUID NOT NULL,
+  joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (chat_id, user_id),
+  FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE messages (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  chat_id UUID NOT NULL,
+  sender_id UUID NOT NULL,
+  type VARCHAR(63) NOT NULL,
+  content VARCHAR(1000) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP,
+  FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
