@@ -1,4 +1,4 @@
-const { faker, ro } = require("@faker-js/faker");
+const { faker } = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 
 const { arraysAreSame, sanitazeSqlString } = require("./utils");

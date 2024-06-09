@@ -40,8 +40,8 @@ const {
 const { selectRoles, selectPermissions } = require("./services");
 const { millisecondsToSeconds } = require("./utils");
 
-const USERS_NUM = 1000;
-const POSTS_NUM = 2000;
+const USERS_NUM = 2000;
+const POSTS_NUM = 1500;
 const COMMENTS_NUM = 3000;
 const REACTIONS_TO_POSTS_NUM = 10000;
 
