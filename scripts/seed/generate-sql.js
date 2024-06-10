@@ -74,7 +74,7 @@ const generateInsertPostsSQL = (posts) =>
   posts
     .map(
       (post) =>
-        `INSERT INTO posts (id, user_id, title, content) VALUES ('${post.id}', '${post.user_id}', '${post.title}', '${post.content}')`
+        `INSERT INTO posts (id, user_id, title, content, created_at) VALUES ('${post.id}', '${post.user_id}', '${post.title}', '${post.content}', '${post.createdAt}')`
     )
     .join(";\n");
 
@@ -82,9 +82,11 @@ const generateInsertPostViewsSQL = (postViews) =>
   postViews
     .map(
       (pv) =>
-        `INSERT INTO post_views (id, post_id, user_id) VALUES ('${pv.id}', '${
-          pv.postId
-        }', ${pv.userId ? `'${pv.userId}'` : null})`
+        `INSERT INTO post_views (id, post_id, user_id, viewed_at) VALUES ('${
+          pv.id
+        }', '${pv.postId}', ${pv.userId ? `'${pv.userId}'` : null}, '${
+          pv.viewedAt
+        }')`
     )
     .join(";\n");
 
@@ -92,7 +94,7 @@ const generateInsertPostCommentsSQL = (comments) =>
   comments
     .map(
       (comment) =>
-        `INSERT INTO comments (id, post_id, user_id, content) VALUES ('${comment.id}', '${comment.post_id}','${comment.user_id}','${comment.content}')`
+        `INSERT INTO comments (id, post_id, user_id, content, created_at) VALUES ('${comment.id}', '${comment.post_id}','${comment.user_id}','${comment.content}', '${comment.createdAt}')`
     )
     .join(";\n");
 
@@ -108,7 +110,7 @@ const generateInsertReactionsToPostsSQL = (reactions) =>
   reactions
     .map(
       (rtp) =>
-        `INSERT INTO reactions_to_posts (id, user_id, post_id, reaction_id) VALUES ('${rtp.id}', '${rtp.user_id}','${rtp.post_id}','${rtp.reaction_id}')`
+        `INSERT INTO reactions_to_posts (id, user_id, post_id, reaction_id, created_at) VALUES ('${rtp.id}', '${rtp.user_id}','${rtp.post_id}','${rtp.reaction_id}', '${rtp.createdAt}')`
     )
     .join(";\n");
 

@@ -194,6 +194,7 @@ async function createPosts(users, n) {
       user_id: faker.helpers.arrayElement(users).id,
       title: sanitazeSqlString(faker.lorem.sentence()),
       content: sanitazeSqlString(faker.lorem.paragraphs()),
+      createdAt: faker.date.past({ years: 10 }).toISOString(),
     });
   }
   return posts;
@@ -213,6 +214,7 @@ async function createPostViews(posts, users) {
         postId: post.id,
         userId:
           Math.random() > 0.5 ? faker.helpers.arrayElement(users).id : null,
+        viewedAt: faker.date.soon({ refDate: post.createdAt }).toISOString(),
       });
     }
   });
@@ -223,11 +225,15 @@ async function createPostViews(posts, users) {
 async function createComments(posts, users, n) {
   const comments = [];
   for (let i = 0; i < n; i++) {
+    const randomPost = faker.helpers.arrayElement(posts);
     comments.push({
       id: faker.string.uuid(),
-      post_id: faker.helpers.arrayElement(posts).id,
+      post_id: randomPost.id,
       user_id: faker.helpers.arrayElement(users).id,
       content: sanitazeSqlString(faker.lorem.sentences()),
+      createdAt: faker.date
+        .soon({ refDate: randomPost.createdAt })
+        .toISOString(),
     });
   }
   return comments;
@@ -249,23 +255,26 @@ async function createReactionsToPosts(posts, users, reactions, n) {
   const reactionsToPosts = [];
   const triplets = [];
   for (let i = 0; i < n; i++) {
-    const postId = faker.helpers.arrayElement(posts).id;
+    const randomPost = faker.helpers.arrayElement(posts);
     const userId = faker.helpers.arrayElement(users).id;
     const reactionId = faker.helpers.arrayElement(reactions).id;
 
     if (
       !triplets.find(
-        (t) => t[0] === postId && t[1] === userId && t[2] === reactionId
+        (t) => t[0] === randomPost.id && t[1] === userId && t[2] === reactionId
       )
     ) {
       reactionsToPosts.push({
         id: faker.string.uuid(),
-        post_id: postId,
+        post_id: randomPost.id,
         user_id: userId,
         reaction_id: reactionId,
+        createdAt: faker.date
+          .soon({ refDate: randomPost.createdAt })
+          .toISOString(),
       });
 
-      triplets.push([postId, userId, reactionId]);
+      triplets.push([randomPost.id, userId, reactionId]);
     }
   }
   return reactionsToPosts;
