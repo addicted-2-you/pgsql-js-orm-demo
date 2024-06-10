@@ -17,6 +17,7 @@ const {
   createChatting,
   createUserEmails,
   createUserPhones,
+  createPostViews,
 } = require("./generate-data");
 const {
   generateInsertUsersSQL,
@@ -36,6 +37,7 @@ const {
   generateChatMembersSQL,
   generateInsertUserEmailsSQL,
   generateInsertUserPhonesSQL,
+  generateInsertPostViewsSQL,
 } = require("./generate-sql");
 const { selectRoles, selectPermissions } = require("./services");
 const { millisecondsToSeconds } = require("./utils");
@@ -110,7 +112,14 @@ async function insertData() {
   const posts = await createPosts(users, POSTS_NUM);
 
   console.info(
-    "posts generated, start generating comments...",
+    "posts generated, start generating post views...",
+    millisecondsToSeconds(performance.now() - startTs)
+  );
+
+  const postViews = await createPostViews(posts, users);
+
+  console.info(
+    "posts views generated, start generating comments...",
     millisecondsToSeconds(performance.now() - startTs)
   );
 
@@ -161,6 +170,7 @@ async function insertData() {
       generateInsertUserRolesSQL(userRoles),
       generateInsertUserPermissionsSQL(userPermissions),
       generateInsertPostsSQL(posts),
+      generateInsertPostViewsSQL(postViews),
       generateInsertPostCommentsSQL(comments),
       generateInsertReactionsSQL(reactions),
       generateInsertReactionsToPostsSQL(reactionsToPosts),

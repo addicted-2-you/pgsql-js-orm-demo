@@ -78,6 +78,16 @@ const generateInsertPostsSQL = (posts) =>
     )
     .join(";\n");
 
+const generateInsertPostViewsSQL = (postViews) =>
+  postViews
+    .map(
+      (pv) =>
+        `INSERT INTO post_views (id, post_id, user_id) VALUES ('${pv.id}', '${
+          pv.postId
+        }', ${pv.userId ? `'${pv.userId}'` : null})`
+    )
+    .join(";\n");
+
 const generateInsertPostCommentsSQL = (comments) =>
   comments
     .map(
@@ -142,6 +152,7 @@ module.exports = {
   generateInsertUserRolesSQL,
   generateInsertUserPermissionsSQL,
   generateInsertPostsSQL,
+  generateInsertPostViewsSQL,
   generateInsertPostCommentsSQL,
   generateInsertReactionsSQL,
   generateInsertReactionsToPostsSQL,

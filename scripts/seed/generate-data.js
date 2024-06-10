@@ -57,6 +57,8 @@ const APPROXIMATE_CHAT_MEMBERS_COUNT = 10;
 
 const APPROXIMATE_MESSAGES_COUNT = 100;
 
+const MIN_POST_VIEWS = 1000;
+
 const FRIEND_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
 
 const createPermissions = async () => {
@@ -195,6 +197,27 @@ async function createPosts(users, n) {
     });
   }
   return posts;
+}
+
+async function createPostViews(posts, users) {
+  const postViews = [];
+
+  posts.forEach((post) => {
+    for (
+      let i = 0;
+      i < MIN_POST_VIEWS * Math.floor(MIN_POST_VIEWS * Math.random());
+      i += 1
+    ) {
+      postViews.push({
+        id: faker.string.uuid(),
+        postId: post.id,
+        userId:
+          Math.random() > 0.5 ? faker.helpers.arrayElement(users).id : null,
+      });
+    }
+  });
+
+  return postViews;
 }
 
 async function createComments(posts, users, n) {
@@ -383,6 +406,7 @@ module.exports = {
   createUsers,
 
   createPosts,
+  createPostViews,
   createComments,
   createReactions,
   createUserAvatars,
