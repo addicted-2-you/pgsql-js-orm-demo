@@ -1,11 +1,10 @@
-//src/auth/auth.service.ts
 import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from 'src/prisma.service';
 import { AuthEntity } from './entity/auth.entity';
