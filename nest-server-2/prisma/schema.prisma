@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model chat_members {
+  chat_id   String    @db.Uuid
+  user_id   String    @db.Uuid
+  joined_at DateTime? @default(now()) @db.Timestamp(6)
+  chats     chats     @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+  users     users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([chat_id, user_id])
+}
+
+model chats {
+  id           String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name         String?        @db.VarChar(255)
+  created_at   DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at   DateTime?      @default(now()) @db.Timestamp(6)
+  deleted_at   DateTime?      @db.Timestamp(6)
+  chat_members chat_members[]
+  messages     messages[]
+}
+
+model comments {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  post_id    String    @db.Uuid
+  user_id    String    @db.Uuid
+  content    String?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
+  posts      posts     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model friend_requests {
+  id                                        String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  requester_id                              String    @db.Uuid
+  receiver_id                               String    @db.Uuid
+  status                                    String    @db.VarChar(63)
+  created_at                                DateTime? @default(now()) @db.Timestamp(6)
+  updated_at                                DateTime? @default(now()) @db.Timestamp(6)
+  users_friend_requests_receiver_idTousers  users     @relation("friend_requests_receiver_idTousers", fields: [receiver_id], references: [id], onDelete: Cascade)
+  users_friend_requests_requester_idTousers users     @relation("friend_requests_requester_idTousers", fields: [requester_id], references: [id], onDelete: Cascade)
+
+  @@unique([requester_id, receiver_id])
+}
+
+model messages {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  chat_id    String    @db.Uuid
+  sender_id  String    @db.Uuid
+  type       String    @db.VarChar(63)
+  content    String    @db.VarChar(1000)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
+  chats      chats     @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+  users      users     @relation(fields: [sender_id], references: [id], onDelete: Cascade)
+}
+
+model permissions {
+  id               String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title            String             @db.VarChar(255)
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamp(6)
+  deleted_at       DateTime?          @db.Timestamp(6)
+  role_permissions role_permissions[]
+  user_permissions user_permissions[]
+}
+
+model post_views {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  post_id    String    @db.Uuid
+  user_id    String?   @db.Uuid
+  viewed_at  DateTime? @default(now()) @db.Timestamp(6)
+  reply_post String?   @db.Uuid
+  posts      posts     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model posts {
+  id                 String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id            String               @db.Uuid
+  title              String               @db.VarChar(255)
+  content            String?
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  deleted_at         DateTime?            @db.Timestamp(6)
+  comments           comments[]
+  post_views         post_views[]
+  users              users                @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  reactions_to_posts reactions_to_posts[]
+}
+
+model reactions {
+  id                 String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title              String               @db.VarChar(255)
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  deleted_at         DateTime?            @db.Timestamp(6)
+  reactions_to_posts reactions_to_posts[]
+}
+
+model reactions_to_posts {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id     String    @db.Uuid
+  post_id     String    @db.Uuid
+  reaction_id String    @db.Uuid
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime? @db.Timestamp(6)
+  posts       posts     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  reactions   reactions @relation(fields: [reaction_id], references: [id], onDelete: Cascade)
+  users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model role_permissions {
+  role_id       String      @db.Uuid
+  permission_id String      @db.Uuid
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+  roles         roles       @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@id([role_id, permission_id])
+}
+
+model roles {
+  id               String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title            String             @db.VarChar(255)
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamp(6)
+  deleted_at       DateTime?          @db.Timestamp(6)
+  role_permissions role_permissions[]
+  user_roles       user_roles[]
+}
+
+model user_avatars {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String?   @unique @db.Uuid
+  avatar_url String    @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model user_emails {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id     String    @db.Uuid
+  email       String    @unique @db.VarChar(255)
+  is_verified Boolean?  @default(false)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime? @db.Timestamp(6)
+  users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_user_email")
+}
+
+model user_permissions {
+  user_id       String      @db.Uuid
+  permission_id String      @db.Uuid
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+  users         users       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, permission_id])
+}
+
+model user_phones {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id     String    @db.Uuid
+  phone       String    @unique @db.VarChar(63)
+  is_verified Boolean?  @default(false)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime? @db.Timestamp(6)
+  users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_user_phone")
+}
+
+model user_roles {
+  user_id String @db.Uuid
+  role_id String @db.Uuid
+  roles   roles  @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  users   users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, role_id])
+}
+
+model users {
+  id                                                  String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username                                            String               @db.VarChar(255)
+  password                                            String               @db.VarChar(255)
+  created_at                                          DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at                                          DateTime?            @default(now()) @db.Timestamp(6)
+  deleted_at                                          DateTime?            @db.Timestamp(6)
+  chat_members                                        chat_members[]
+  comments                                            comments[]
+  friend_requests_friend_requests_receiver_idTousers  friend_requests[]    @relation("friend_requests_receiver_idTousers")
+  friend_requests_friend_requests_requester_idTousers friend_requests[]    @relation("friend_requests_requester_idTousers")
+  messages                                            messages[]
+  post_views                                          post_views[]
+  posts                                               posts[]
+  reactions_to_posts                                  reactions_to_posts[]
+  user_avatars                                        user_avatars?
+  user_emails                                         user_emails[]
+  user_permissions                                    user_permissions[]
+  user_phones                                         user_phones[]
+  user_roles                                          user_roles[]
+}
