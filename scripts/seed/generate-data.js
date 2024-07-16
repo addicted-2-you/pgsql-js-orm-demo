@@ -57,8 +57,6 @@ const APPROXIMATE_CHAT_MEMBERS_COUNT = 10;
 
 const APPROXIMATE_MESSAGES_COUNT = 100;
 
-const MIN_POST_VIEWS = 1000;
-
 const FRIEND_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
 
 const createPermissions = async () => {
@@ -201,21 +199,38 @@ async function createPosts(users, n) {
 }
 
 async function createPostViews(posts, users) {
+  const minPostsViews = Math.floor(users.length / 2);
+
   const postViews = [];
 
   posts.forEach((post) => {
+    const postViewsMap = {}; // { [postId]: { [userId]: true } }
+
     for (
       let i = 0;
-      i < MIN_POST_VIEWS * Math.floor(MIN_POST_VIEWS * Math.random());
+      i < minPostsViews + Math.floor(minPostsViews * Math.random());
       i += 1
     ) {
-      postViews.push({
-        id: faker.string.uuid(),
-        postId: post.id,
-        userId:
-          Math.random() > 0.5 ? faker.helpers.arrayElement(users).id : null,
-        viewedAt: faker.date.soon({ refDate: post.createdAt }).toISOString(),
-      });
+      const userId =
+        Math.random() > 0.5 ? faker.helpers.arrayElement(users).id : null;
+
+      if (
+        userId &&
+        (!postViewsMap[post.id] || !postViewsMap[post.id][userId])
+      ) {
+        postViews.push({
+          id: faker.string.uuid(),
+          postId: post.id,
+          userId,
+          viewedAt: faker.date.soon({ refDate: post.createdAt }).toISOString(),
+        });
+
+        if (!postViewsMap[post.id]) {
+          postViewsMap[post.id] = { [userId]: true };
+        } else {
+          postViewsMap[post.id][userId] = true;
+        }
+      }
     }
   });
 
