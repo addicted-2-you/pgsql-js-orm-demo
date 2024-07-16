@@ -281,7 +281,8 @@ async function createReactionsToPosts(posts, users, reactions, n) {
 }
 
 async function createFriendRequests(users) {
-  const friendRequsts = [];
+  const friendRequests = [];
+  const friendRequestsMap = {}; // { [requesterId]: { [receiverId]: true } }
 
   users.forEach((user) => {
     const dispersionDirection = Math.random() > 0.5 ? 1 : -1;
@@ -296,13 +297,12 @@ async function createFriendRequests(users) {
       const randomUser = users[Math.floor(Math.random() * users.length)];
       if (
         user.id !== randomUser.id &&
-        !friendRequsts.find(
-          (fr) =>
-            (fr.requesterId === user.id && fr.receiverId === randomUser.id) ||
-            (fr.requesterId === randomUser.id && fr.receiverId === user.id)
-        )
+        (!friendRequestsMap[user.id] ||
+          !friendRequestsMap[user.id][randomUser.id]) &&
+        (!friendRequestsMap[randomUser.id] ||
+          friendRequestsMap[randomUser.id][user.id])
       ) {
-        friendRequsts.push({
+        friendRequests.push({
           id: faker.string.uuid(),
           requesterId: user.id,
           receiverId: randomUser.id,
@@ -311,11 +311,17 @@ async function createFriendRequests(users) {
               Math.floor(Math.random() * FRIEND_REQUEST_STATUSES.length)
             ],
         });
+
+        if (!friendRequestsMap[user.id]) {
+          friendRequestsMap[user.id] = { [randomUser.id]: true };
+        } else {
+          friendRequestsMap[user.id][randomUser.id] = true;
+        }
       }
     }
   });
 
-  return friendRequsts;
+  return friendRequests;
 }
 
 async function createChatting(users) {
