@@ -16,8 +16,36 @@ const millisecondsToSeconds = (ms) => ms / 1000;
 
 const sanitazeSqlString = (str) => str.replaceAll("'", "");
 
+const withTimeMeasureSync =
+  (fn) =>
+  (...args) => {
+    try {
+      console.time(fn.name);
+      const result = fn.apply(null, args);
+      console.timeEnd(fn.name);
+      return result;
+    } catch (err) {
+      console.error(fn, err);
+    }
+  };
+
+const withTimeMeasureAsync =
+  (fn) =>
+  async (...args) => {
+    try {
+      console.time(fn.name);
+      const result = await fn.apply(null, args);
+      console.timeEnd(fn.name);
+      return result;
+    } catch (err) {
+      console.error(fn, err);
+    }
+  };
+
 module.exports = {
   arraysAreSame,
   millisecondsToSeconds,
   sanitazeSqlString,
+  withTimeMeasureSync,
+  withTimeMeasureAsync,
 };
