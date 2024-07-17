@@ -1,7 +1,7 @@
 const { faker } = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 
-const { arraysAreSame, sanitazeSqlString } = require("./utils");
+const { sanitazeSqlString, compareObjects } = require("./utils");
 
 const POST_PERMISSION_TITLES = ["create_post", "delete_any_post"];
 
@@ -359,7 +359,7 @@ async function createChatting(users) {
         id: faker.string.uuid(),
         name: sanitazeSqlString(faker.company.buzzNoun()),
       };
-      const chatMembers = [user.id];
+      const chatMembersMap = { [user.id]: true };
       const messages = [];
       for (
         let j = 0;
@@ -367,16 +367,15 @@ async function createChatting(users) {
         j += 1
       ) {
         const randomUser = users[Math.floor(Math.random() * users.length)];
-        if (
-          user !== randomUser.id &&
-          !chatMembers.find((cm) => cm === randomUser.id)
-        ) {
-          chatMembers.push(randomUser.id);
+        if (user !== randomUser.id && !chatMembersMap[randomUser.id]) {
+          chatMembersMap[randomUser.id] = true;
         }
 
+        const chatMembersArray = Object.keys(chatMembersMap);
+
         if (
-          !Object.values(chatsMembers).find((ms) =>
-            arraysAreSame(chatMembers, ms)
+          !Object.values(chatsMembers).some((mbs) =>
+            compareObjects(chatMembersMap, mbs)
           )
         ) {
           for (
@@ -387,8 +386,7 @@ async function createChatting(users) {
             messages.push({
               id: faker.string.uuid(),
               chatId: chat.id,
-              senderId:
-                chatMembers[Math.floor(Math.random() * chatMembers.length)],
+              senderId: faker.helpers.arrayElement(chatMembersArray),
               type: "text",
               content: sanitazeSqlString(
                 faker.word.words({ count: { min: 5, max: 15 } })
@@ -401,7 +399,7 @@ async function createChatting(users) {
 
       if (messages.length) {
         chats.push(chat);
-        chatsMembers[chat.id] = chatMembers;
+        chatsMembers[chat.id] = chatMembersMap;
         chatsMessages.push(...messages);
       }
     }
@@ -412,7 +410,7 @@ async function createChatting(users) {
     chatsMembers: Object.entries(chatsMembers).reduce(
       (acc, [chatId, members]) => {
         const flattenMembers = [];
-        members.forEach((userId) => {
+        Object.keys(members).forEach((userId) => {
           flattenMembers.push({
             chatId,
             userId,
