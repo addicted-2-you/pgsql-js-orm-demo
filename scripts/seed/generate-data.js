@@ -1,7 +1,7 @@
 const { faker } = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 
-const { arraysAreSame, sanitazeSqlString } = require("./utils");
+const { sanitazeSqlString, compareObjects } = require("./utils");
 
 const POST_PERMISSION_TITLES = ["create_post", "delete_any_post"];
 
@@ -56,8 +56,6 @@ const CHATS_COUNT_DISPERSION = 1;
 const APPROXIMATE_CHAT_MEMBERS_COUNT = 10;
 
 const APPROXIMATE_MESSAGES_COUNT = 100;
-
-const MIN_POST_VIEWS = 1000;
 
 const FRIEND_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
 
@@ -201,21 +199,38 @@ async function createPosts(users, n) {
 }
 
 async function createPostViews(posts, users) {
+  const minPostsViews = Math.floor(users.length / 2);
+
   const postViews = [];
 
   posts.forEach((post) => {
+    const postViewsMap = {}; // { [postId]: { [userId]: true } }
+
     for (
       let i = 0;
-      i < MIN_POST_VIEWS * Math.floor(MIN_POST_VIEWS * Math.random());
+      i < minPostsViews + Math.floor(minPostsViews * Math.random());
       i += 1
     ) {
-      postViews.push({
-        id: faker.string.uuid(),
-        postId: post.id,
-        userId:
-          Math.random() > 0.5 ? faker.helpers.arrayElement(users).id : null,
-        viewedAt: faker.date.soon({ refDate: post.createdAt }).toISOString(),
-      });
+      const userId =
+        Math.random() > 0.5 ? faker.helpers.arrayElement(users).id : null;
+
+      if (
+        userId &&
+        (!postViewsMap[post.id] || !postViewsMap[post.id][userId])
+      ) {
+        postViews.push({
+          id: faker.string.uuid(),
+          postId: post.id,
+          userId,
+          viewedAt: faker.date.soon({ refDate: post.createdAt }).toISOString(),
+        });
+
+        if (!postViewsMap[post.id]) {
+          postViewsMap[post.id] = { [userId]: true };
+        } else {
+          postViewsMap[post.id][userId] = true;
+        }
+      }
     }
   });
 
@@ -281,7 +296,8 @@ async function createReactionsToPosts(posts, users, reactions, n) {
 }
 
 async function createFriendRequests(users) {
-  const friendRequsts = [];
+  const friendRequests = [];
+  const friendRequestsMap = {}; // { [requesterId]: { [receiverId]: true } }
 
   users.forEach((user) => {
     const dispersionDirection = Math.random() > 0.5 ? 1 : -1;
@@ -296,13 +312,12 @@ async function createFriendRequests(users) {
       const randomUser = users[Math.floor(Math.random() * users.length)];
       if (
         user.id !== randomUser.id &&
-        !friendRequsts.find(
-          (fr) =>
-            (fr.requesterId === user.id && fr.receiverId === randomUser.id) ||
-            (fr.requesterId === randomUser.id && fr.receiverId === user.id)
-        )
+        (!friendRequestsMap[user.id] ||
+          !friendRequestsMap[user.id][randomUser.id]) &&
+        (!friendRequestsMap[randomUser.id] ||
+          friendRequestsMap[randomUser.id][user.id])
       ) {
-        friendRequsts.push({
+        friendRequests.push({
           id: faker.string.uuid(),
           requesterId: user.id,
           receiverId: randomUser.id,
@@ -311,11 +326,17 @@ async function createFriendRequests(users) {
               Math.floor(Math.random() * FRIEND_REQUEST_STATUSES.length)
             ],
         });
+
+        if (!friendRequestsMap[user.id]) {
+          friendRequestsMap[user.id] = { [randomUser.id]: true };
+        } else {
+          friendRequestsMap[user.id][randomUser.id] = true;
+        }
       }
     }
   });
 
-  return friendRequsts;
+  return friendRequests;
 }
 
 async function createChatting(users) {
@@ -338,7 +359,7 @@ async function createChatting(users) {
         id: faker.string.uuid(),
         name: sanitazeSqlString(faker.company.buzzNoun()),
       };
-      const chatMembers = [user.id];
+      const chatMembersMap = { [user.id]: true };
       const messages = [];
       for (
         let j = 0;
@@ -346,16 +367,15 @@ async function createChatting(users) {
         j += 1
       ) {
         const randomUser = users[Math.floor(Math.random() * users.length)];
-        if (
-          user !== randomUser.id &&
-          !chatMembers.find((cm) => cm === randomUser.id)
-        ) {
-          chatMembers.push(randomUser.id);
+        if (user !== randomUser.id && !chatMembersMap[randomUser.id]) {
+          chatMembersMap[randomUser.id] = true;
         }
 
+        const chatMembersArray = Object.keys(chatMembersMap);
+
         if (
-          !Object.values(chatsMembers).find((ms) =>
-            arraysAreSame(chatMembers, ms)
+          !Object.values(chatsMembers).some((mbs) =>
+            compareObjects(chatMembersMap, mbs)
           )
         ) {
           for (
@@ -366,8 +386,7 @@ async function createChatting(users) {
             messages.push({
               id: faker.string.uuid(),
               chatId: chat.id,
-              senderId:
-                chatMembers[Math.floor(Math.random() * chatMembers.length)],
+              senderId: faker.helpers.arrayElement(chatMembersArray),
               type: "text",
               content: sanitazeSqlString(
                 faker.word.words({ count: { min: 5, max: 15 } })
@@ -380,7 +399,7 @@ async function createChatting(users) {
 
       if (messages.length) {
         chats.push(chat);
-        chatsMembers[chat.id] = chatMembers;
+        chatsMembers[chat.id] = chatMembersMap;
         chatsMessages.push(...messages);
       }
     }
@@ -391,7 +410,7 @@ async function createChatting(users) {
     chatsMembers: Object.entries(chatsMembers).reduce(
       (acc, [chatId, members]) => {
         const flattenMembers = [];
-        members.forEach((userId) => {
+        Object.keys(members).forEach((userId) => {
           flattenMembers.push({
             chatId,
             userId,
