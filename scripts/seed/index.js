@@ -12,10 +12,10 @@ const {
   createUserRoles,
   createRoles,
   createFriendRequests,
-  createChatting,
   createUserEmails,
   createUserPhones,
   createPostViews,
+  runCreateChattingWorker,
 } = require("./generate-data");
 const {
   generateInsertUsersSQL,
@@ -50,6 +50,10 @@ async function insertData() {
     await client.connect();
 
     const users = await withTimeMeasureAsync(createUsers)(USERS_NUM);
+
+    const createChattingWorkerPromise = withTimeMeasureAsync(
+      runCreateChattingWorker
+    )(users);
 
     const avatars = await withTimeMeasureAsync(createUserAvatars)(users);
 
@@ -113,9 +117,8 @@ async function insertData() {
       users
     );
 
-    const { chats, chatsMembers, chatsMessages } = await withTimeMeasureAsync(
-      createChatting
-    )(users);
+    const { chats, chatsMembers, chatsMessages } =
+      await createChattingWorkerPromise;
 
     await client.query(
       [
