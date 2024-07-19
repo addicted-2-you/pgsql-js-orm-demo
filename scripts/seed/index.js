@@ -12,10 +12,10 @@ const {
   createUserRoles,
   createRoles,
   createFriendRequests,
-  createChatting,
   createUserEmails,
   createUserPhones,
   createPostViews,
+  runCreateChattingWorker,
 } = require("./generate-data");
 const {
   generateInsertUsersSQL,
@@ -40,7 +40,7 @@ const {
 const { selectRoles, selectPermissions } = require("./services");
 const { withTimeMeasureAsync, withTimeMeasureSync } = require("./utils");
 
-const USERS_NUM = 2000;
+const USERS_NUM = 200;
 const POSTS_NUM = 1500;
 const COMMENTS_NUM = 3000;
 const REACTIONS_TO_POSTS_NUM = 10000;
@@ -50,6 +50,10 @@ async function insertData() {
     await client.connect();
 
     const users = await withTimeMeasureAsync(createUsers)(USERS_NUM);
+
+    const createChattingWorkerPromise = withTimeMeasureAsync(
+      runCreateChattingWorker
+    )(users);
 
     const avatars = await withTimeMeasureAsync(createUserAvatars)(users);
 
@@ -113,9 +117,8 @@ async function insertData() {
       users
     );
 
-    const { chats, chatsMembers, chatsMessages } = await withTimeMeasureAsync(
-      createChatting
-    )(users);
+    const { chats, chatsMembers, chatsMessages } =
+      await createChattingWorkerPromise;
 
     await client.query(
       [
