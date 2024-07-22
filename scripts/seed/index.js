@@ -40,10 +40,10 @@ const {
 const { selectRoles, selectPermissions, writeSql } = require("./services");
 const { withTimeMeasureAsync, withTimeMeasureSync } = require("./utils");
 
-const USERS_NUM = 3000;
+const USERS_NUM = 5000;
 const POSTS_NUM = 2500;
-const COMMENTS_NUM = 4000;
-const REACTIONS_TO_POSTS_NUM = 10000;
+const COMMENTS_NUM = 10000;
+const REACTIONS_TO_POSTS_NUM = 20000;
 
 async function insertData() {
   try {
