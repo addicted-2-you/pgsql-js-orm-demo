@@ -16,7 +16,12 @@ const selectPermissions = async () => {
   }));
 };
 
+const writeSql = async (sql) => {
+  await client.query(sql);
+};
+
 module.exports = {
   selectRoles,
   selectPermissions,
+  writeSql,
 };

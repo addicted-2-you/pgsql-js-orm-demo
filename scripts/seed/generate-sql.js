@@ -1,147 +1,225 @@
-const generateInsertUsersSQL = (users) =>
-  users
-    .map(
-      (user) =>
-        `INSERT INTO users (id, username, password) VALUES ('${user.id}', '${user.username}', '${user.password}')`
-    )
-    .join(";\n");
+const generateInsertUsersSQL = (users) => {
+  if (!users.length) {
+    return "";
+  }
 
-const generateInsertUserAvatarsSQL = (userAvatars) =>
-  userAvatars
+  const values = users
+    .map((user) => `('${user.id}', '${user.username}', '${user.password}')`)
+    .join(",\n");
+  return `INSERT INTO users (id, username, password) VALUES\n${values};`;
+};
+
+const generateInsertUserAvatarsSQL = (userAvatars) => {
+  if (!userAvatars.length) {
+    return "";
+  }
+
+  const values = userAvatars
     .map(
       (avatar) =>
-        `INSERT INTO user_avatars (id, user_id, avatar_url) VALUES ('${avatar.id}', '${avatar.user_id}', '${avatar.avatar_url}')`
+        `('${avatar.id}', '${avatar.user_id}', '${avatar.avatar_url}')`
     )
-    .join(";\n");
+    .join(",\n");
+  return `INSERT INTO user_avatars (id, user_id, avatar_url) VALUES\n${values};`;
+};
 
-const generateInsertUserEmailsSQL = (userEmails) =>
-  userEmails
+const generateInsertUserEmailsSQL = (userEmails) => {
+  if (!userEmails.length) {
+    return "";
+  }
+
+  const values = userEmails
     .map(
-      (ue) =>
-        `INSERT INTO user_emails (id, user_id, email, is_verified) VALUES ('${ue.id}', '${ue.userId}', '${ue.email}', '${ue.isVerified}')`
+      (ue) => `('${ue.id}', '${ue.userId}', '${ue.email}', '${ue.isVerified}')`
     )
-    .join(";\n");
+    .join(",\n");
+  return `INSERT INTO user_emails (id, user_id, email, is_verified) VALUES\n${values};`;
+};
 
-const generateInsertUserPhonesSQL = (userPhones) =>
-  userPhones
+const generateInsertUserPhonesSQL = (userPhones) => {
+  if (!userPhones.length) {
+    return "";
+  }
+
+  const values = userPhones
     .map(
-      (up) =>
-        `INSERT INTO user_phones (id, user_id, phone, is_verified) VALUES ('${up.id}', '${up.userId}', '${up.phone}', '${up.isVerified}')`
+      (up) => `('${up.id}', '${up.userId}', '${up.phone}', '${up.isVerified}')`
     )
-    .join(";\n");
+    .join(",\n");
+  return `INSERT INTO user_phones (id, user_id, phone, is_verified) VALUES\n${values};`;
+};
 
-const generateInsertPermissionsSQL = (permissions) =>
-  permissions
-    .map(
-      (permission) =>
-        `INSERT INTO permissions (id, title) VALUES ('${permission.id}', '${permission.title}')`
-    )
-    .join(";\n");
+const generateInsertPermissionsSQL = (permissions) => {
+  if (!permissions.length) {
+    return "";
+  }
 
-const generateInsertRolesSQL = (roles) =>
-  roles
-    .map(
-      (role) =>
-        `INSERT INTO roles (id, title) VALUES ('${role.id}', '${role.title}')`
-    )
-    .join(";\n");
+  const values = permissions
+    .map((permission) => `('${permission.id}', '${permission.title}')`)
+    .join(",\n");
+  return `INSERT INTO permissions (id, title) VALUES\n${values};`;
+};
 
-const generateInsertRolePermissionsSQL = (rolePermissions) =>
-  rolePermissions
-    .map(
-      (rp) =>
-        `INSERT INTO role_permissions (role_id, permission_id) VALUES ('${rp.role_id}', '${rp.permission_id}')`
-    )
-    .join(";\n");
+const generateInsertRolesSQL = (roles) => {
+  if (!roles.length) {
+    return "";
+  }
 
-const generateInsertUserRolesSQL = (userRoles) =>
-  userRoles
-    .map(
-      (ur) =>
-        `INSERT INTO user_roles (user_id, role_id) VALUES ('${ur.user_id}', '${ur.role_id}')`
-    )
-    .join(";\n");
+  const values = roles
+    .map((role) => `('${role.id}', '${role.title}')`)
+    .join(",\n");
+  return `INSERT INTO roles (id, title) VALUES\n${values};`;
+};
 
-const generateInsertUserPermissionsSQL = (userPermissions) =>
-  userPermissions
-    .map(
-      (up) =>
-        `INSERT INTO user_roles (user_id, permission_id) VALUES ('${up.user_id}', '${up.permission_id}')`
-    )
-    .join(";\n");
+const generateInsertRolePermissionsSQL = (rolePermissions) => {
+  if (!rolePermissions.length) {
+    return "";
+  }
 
-const generateInsertPostsSQL = (posts) =>
-  posts
+  const values = rolePermissions
+    .map((rp) => `('${rp.role_id}', '${rp.permission_id}')`)
+    .join(",\n");
+  return `INSERT INTO role_permissions (role_id, permission_id) VALUES\n${values};`;
+};
+
+const generateInsertUserRolesSQL = (userRoles) => {
+  if (!userRoles.length) {
+    return "";
+  }
+
+  const values = userRoles
+    .map((ur) => `('${ur.user_id}', '${ur.role_id}')`)
+    .join(",\n");
+  return `INSERT INTO user_roles (user_id, role_id) VALUES\n${values};`;
+};
+
+const generateInsertUserPermissionsSQL = (userPermissions) => {
+  if (!userPermissions.length) {
+    return "";
+  }
+
+  const values = userPermissions
+    .map((up) => `('${up.user_id}', '${up.permission_id}')`)
+    .join(",\n");
+  return `INSERT INTO user_permissions (user_id, permission_id) VALUES\n${values};`;
+};
+
+const generateInsertPostsSQL = (posts) => {
+  if (!posts.length) {
+    return "";
+  }
+
+  const values = posts
     .map(
       (post) =>
-        `INSERT INTO posts (id, user_id, title, content, created_at) VALUES ('${post.id}', '${post.user_id}', '${post.title}', '${post.content}', '${post.createdAt}')`
+        `('${post.id}', '${post.user_id}', '${post.title}', '${post.content}', '${post.createdAt}')`
     )
-    .join(";\n");
+    .join(",\n");
+  return `INSERT INTO posts (id, user_id, title, content, created_at) VALUES\n${values};`;
+};
 
-const generateInsertPostViewsSQL = (postViews) =>
-  postViews
+const generateInsertPostViewsSQL = (postViews) => {
+  if (!postViews.length) {
+    return "";
+  }
+
+  const values = postViews
     .map(
       (pv) =>
-        `INSERT INTO post_views (id, post_id, user_id, viewed_at) VALUES ('${
-          pv.id
-        }', '${pv.postId}', ${pv.userId ? `'${pv.userId}'` : null}, '${
-          pv.viewedAt
-        }')`
+        `('${pv.id}', '${pv.postId}', ${
+          pv.userId ? `'${pv.userId}'` : null
+        }, '${pv.viewedAt}')`
     )
-    .join(";\n");
+    .join(",\n");
+  return `INSERT INTO post_views (id, post_id, user_id, viewed_at) VALUES\n${values};`;
+};
 
-const generateInsertPostCommentsSQL = (comments) =>
-  comments
+const generateInsertPostCommentsSQL = (comments) => {
+  if (!comments.length) {
+    return "";
+  }
+
+  const values = comments
     .map(
       (comment) =>
-        `INSERT INTO comments (id, post_id, user_id, content, created_at) VALUES ('${comment.id}', '${comment.post_id}','${comment.user_id}','${comment.content}', '${comment.createdAt}')`
+        `('${comment.id}', '${comment.post_id}', '${comment.user_id}', '${comment.content}', '${comment.createdAt}')`
     )
-    .join(";\n");
+    .join(",\n");
+  return `INSERT INTO comments (id, post_id, user_id, content, created_at) VALUES\n${values};`;
+};
 
-const generateInsertReactionsSQL = (reactions) =>
-  reactions
-    .map(
-      (reaction) =>
-        `INSERT INTO reactions (id, title) VALUES ('${reaction.id}', '${reaction.title}')`
-    )
-    .join(";\n");
+const generateInsertReactionsSQL = (reactions) => {
+  if (!reactions.length) {
+    return "";
+  }
 
-const generateInsertReactionsToPostsSQL = (reactions) =>
-  reactions
+  const values = reactions
+    .map((reaction) => `('${reaction.id}', '${reaction.title}')`)
+    .join(",\n");
+  return `INSERT INTO reactions (id, title) VALUES\n${values};`;
+};
+
+const generateInsertReactionsToPostsSQL = (reactions) => {
+  if (!reactions.length) {
+    return "";
+  }
+
+  const values = reactions
     .map(
       (rtp) =>
-        `INSERT INTO reactions_to_posts (id, user_id, post_id, reaction_id, created_at) VALUES ('${rtp.id}', '${rtp.user_id}','${rtp.post_id}','${rtp.reaction_id}', '${rtp.createdAt}')`
+        `('${rtp.id}', '${rtp.user_id}', '${rtp.post_id}', '${rtp.reaction_id}', '${rtp.createdAt}')`
     )
-    .join(";\n");
+    .join(",\n");
+  return `INSERT INTO reactions_to_posts (id, user_id, post_id, reaction_id, created_at) VALUES\n${values};`;
+};
 
-const generateFriendRequestsSQL = (friendRequests) =>
-  friendRequests
+const generateFriendRequestsSQL = (friendRequests) => {
+  if (!friendRequests.length) {
+    return "";
+  }
+
+  const values = friendRequests
     .map(
       (fr) =>
-        `INSERT INTO friend_requests (id, requester_id, receiver_id, status) VALUES ('${fr.id}', '${fr.requesterId}', '${fr.receiverId}', '${fr.status}')`
+        `('${fr.id}', '${fr.requesterId}', '${fr.receiverId}', '${fr.status}')`
     )
-    .join(";\n");
+    .join(",\n");
+  return `INSERT INTO friend_requests (id, requester_id, receiver_id, status) VALUES\n${values};`;
+};
 
-const generateChatsSQL = (chats) =>
-  chats
-    .map((c) => `INSERT INTO chats (id, name) VALUES ('${c.id}', '${c.name}')`)
-    .join(";\n");
+const generateChatsSQL = (chats) => {
+  if (!chats.length) {
+    return "";
+  }
 
-const generateChatMembersSQL = (chatMembers) =>
-  chatMembers
-    .map(
-      (cm) =>
-        `INSERT INTO chat_members (chat_id, user_id) VALUES ('${cm.chatId}', '${cm.userId}')`
-    )
-    .join(";\n");
+  const values = chats.map((c) => `('${c.id}', '${c.name}')`).join(",\n");
+  return `INSERT INTO chats (id, name) VALUES\n${values};`;
+};
 
-const generateMessagesSQL = (messages) =>
-  messages
+const generateChatMembersSQL = (chatMembers) => {
+  if (!chatMembers.length) {
+    return "";
+  }
+
+  const values = chatMembers
+    .map((cm) => `('${cm.chatId}', '${cm.userId}')`)
+    .join(",\n");
+  return `INSERT INTO chat_members (chat_id, user_id) VALUES\n${values};`;
+};
+
+const generateMessagesSQL = (messages) => {
+  if (!messages.length) {
+    return "";
+  }
+
+  const values = messages
     .map(
       (m) =>
-        `INSERT INTO messages (id, chat_id, sender_id, type, content, created_at) VALUES ('${m.id}', '${m.chatId}', '${m.senderId}', '${m.type}', '${m.content}', '${m.createdAt}')`
+        `('${m.id}', '${m.chatId}', '${m.senderId}', '${m.type}', '${m.content}', '${m.createdAt}')`
     )
-    .join(";\n");
+    .join(",\n");
+  return `INSERT INTO messages (id, chat_id, sender_id, type, content, created_at) VALUES\n${values};`;
+};
 
 module.exports = {
   generateInsertUsersSQL,

@@ -37,12 +37,12 @@ const {
   generateInsertUserPhonesSQL,
   generateInsertPostViewsSQL,
 } = require("./generate-sql");
-const { selectRoles, selectPermissions } = require("./services");
+const { selectRoles, selectPermissions, writeSql } = require("./services");
 const { withTimeMeasureAsync, withTimeMeasureSync } = require("./utils");
 
-const USERS_NUM = 2000;
-const POSTS_NUM = 1500;
-const COMMENTS_NUM = 3000;
+const USERS_NUM = 3000;
+const POSTS_NUM = 2500;
+const COMMENTS_NUM = 4000;
 const REACTIONS_TO_POSTS_NUM = 10000;
 
 async function insertData() {
@@ -117,30 +117,28 @@ async function insertData() {
       createChatting
     )(users);
 
-    await client.query(
-      [
-        withTimeMeasureSync(generateInsertUsersSQL)(users),
-        withTimeMeasureSync(generateInsertUserAvatarsSQL)(avatars),
-        withTimeMeasureSync(generateInsertUserEmailsSQL)(emails),
-        withTimeMeasureSync(generateInsertUserPhonesSQL)(phones),
-        withTimeMeasureSync(generateInsertPermissionsSQL)(permissions),
-        withTimeMeasureSync(generateInsertRolesSQL)(roles),
-        withTimeMeasureSync(generateInsertRolePermissionsSQL)(rolePermissions),
-        withTimeMeasureSync(generateInsertUserRolesSQL)(userRoles),
-        withTimeMeasureSync(generateInsertUserPermissionsSQL)(userPermissions),
-        withTimeMeasureSync(generateInsertPostsSQL)(posts),
-        withTimeMeasureSync(generateInsertPostViewsSQL)(postViews),
-        withTimeMeasureSync(generateInsertPostCommentsSQL)(comments),
-        withTimeMeasureSync(generateInsertReactionsSQL)(reactions),
-        withTimeMeasureSync(generateInsertReactionsToPostsSQL)(
-          reactionsToPosts
-        ),
-        withTimeMeasureSync(generateFriendRequestsSQL)(friendRequests),
-        withTimeMeasureSync(generateChatsSQL)(chats),
-        withTimeMeasureSync(generateChatMembersSQL)(chatsMembers),
-        withTimeMeasureSync(generateMessagesSQL)(chatsMessages),
-      ].join(";\n")
-    );
+    const sql = [
+      withTimeMeasureSync(generateInsertUsersSQL)(users),
+      withTimeMeasureSync(generateInsertUserAvatarsSQL)(avatars),
+      withTimeMeasureSync(generateInsertUserEmailsSQL)(emails),
+      withTimeMeasureSync(generateInsertUserPhonesSQL)(phones),
+      withTimeMeasureSync(generateInsertPermissionsSQL)(permissions),
+      withTimeMeasureSync(generateInsertRolesSQL)(roles),
+      withTimeMeasureSync(generateInsertRolePermissionsSQL)(rolePermissions),
+      withTimeMeasureSync(generateInsertUserRolesSQL)(userRoles),
+      withTimeMeasureSync(generateInsertUserPermissionsSQL)(userPermissions),
+      withTimeMeasureSync(generateInsertPostsSQL)(posts),
+      withTimeMeasureSync(generateInsertPostViewsSQL)(postViews),
+      withTimeMeasureSync(generateInsertPostCommentsSQL)(comments),
+      withTimeMeasureSync(generateInsertReactionsSQL)(reactions),
+      withTimeMeasureSync(generateInsertReactionsToPostsSQL)(reactionsToPosts),
+      withTimeMeasureSync(generateFriendRequestsSQL)(friendRequests),
+      withTimeMeasureSync(generateChatsSQL)(chats),
+      withTimeMeasureSync(generateChatMembersSQL)(chatsMembers),
+      withTimeMeasureSync(generateMessagesSQL)(chatsMessages),
+    ].join("\n");
+
+    await withTimeMeasureAsync(writeSql)(sql);
   } catch (err) {
     console.error(err);
   } finally {
