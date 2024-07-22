@@ -1,3 +1,6 @@
+const chalk = require("chalk");
+const { formatDuration, intervalToDuration } = require("date-fns");
+
 function arraysAreSame(arr1, arr2) {
   if (arr1.length !== arr2.length) {
     return false;
@@ -40,13 +43,59 @@ const millisecondsToSeconds = (ms) => ms / 1000;
 
 const sanitazeSqlString = (str) => str.replaceAll("'", "");
 
+const logExecTime = (ms, fnName) => {
+  const durationObject = intervalToDuration({ start: 0, end: ms });
+  const formattedDuration = formatDuration(durationObject);
+
+  switch (true) {
+    case ms >= 0 && ms < 500: {
+      console.log(
+        `${fnName}: `,
+        chalk.green.bold(formattedDuration || `${ms}ms`)
+      );
+      break;
+    }
+
+    case ms >= 500 && ms < 3000: {
+      console.log(
+        `${fnName}: `,
+        chalk.yellow.bold(formattedDuration || `${ms}ms`)
+      );
+      break;
+    }
+
+    case ms >= 3000 && ms < 10000: {
+      console.log(
+        `${fnName}: `,
+        chalk.red.bold(formattedDuration || `${ms}ms`)
+      );
+      break;
+    }
+
+    case ms >= 10000: {
+      console.log(
+        `${fnName}: `,
+        chalk.magenta.bold(formattedDuration || `${ms}ms`)
+      );
+      break;
+    }
+
+    default: {
+      console.log(`${fnName}: ${ms}ms`);
+      break;
+    }
+  }
+};
+
 const withTimeMeasureSync =
   (fn) =>
   (...args) => {
     try {
-      console.time(fn.name);
+      const startTs = performance.now();
       const result = fn.apply(null, args);
-      console.timeEnd(fn.name);
+      const finishTs = performance.now();
+      const ms = +(finishTs - startTs).toFixed(2);
+      logExecTime(ms, fn.name);
       return result;
     } catch (err) {
       console.error(fn, err);
@@ -57,9 +106,11 @@ const withTimeMeasureAsync =
   (fn) =>
   async (...args) => {
     try {
-      console.time(fn.name);
+      const startTs = performance.now();
       const result = await fn.apply(null, args);
-      console.timeEnd(fn.name);
+      const finishTs = performance.now();
+      const ms = +(finishTs - startTs).toFixed(2);
+      logExecTime(ms, fn.name);
       return result;
     } catch (err) {
       console.error(fn, err);

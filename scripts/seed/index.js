@@ -40,7 +40,7 @@ const {
 const { selectRoles, selectPermissions } = require("./services");
 const { withTimeMeasureAsync, withTimeMeasureSync } = require("./utils");
 
-const USERS_NUM = 200;
+const USERS_NUM = 2000;
 const POSTS_NUM = 1500;
 const COMMENTS_NUM = 3000;
 const REACTIONS_TO_POSTS_NUM = 10000;
