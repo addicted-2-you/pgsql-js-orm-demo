@@ -1,6 +1,3 @@
-const path = require("node:path");
-const { Worker } = require("node:worker_threads");
-
 const { faker } = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 
@@ -426,26 +423,6 @@ async function createChatting(users) {
   };
 }
 
-const runCreateChattingWorker = (users) =>
-  new Promise((resolve, reject) => {
-    const worker = new Worker(
-      path.join(__dirname, "./create-chatting-worker.js"),
-      {
-        workerData: { users },
-      }
-    );
-
-    worker.on("message", resolve);
-
-    worker.on("error", reject);
-
-    worker.on("exit", (code) => {
-      if (code !== 0) {
-        reject(new Error(`Worker stopped with exit code ${code}`));
-      }
-    });
-  });
-
 module.exports = {
   createPermissions,
   createRoles,
@@ -464,5 +441,4 @@ module.exports = {
   createReactionsToPosts,
   createFriendRequests,
   createChatting,
-  runCreateChattingWorker,
 };
