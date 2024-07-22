@@ -27,7 +27,6 @@ const {
   generateInsertUserPermissionsSQL,
   generateInsertPostsSQL,
   generateInsertPostCommentsSQL,
-  generateInsertReactionsSQL,
   generateInsertReactionsToPostsSQL,
   generateFriendRequestsSQL,
   generateChatsSQL,
@@ -40,10 +39,10 @@ const {
 const { selectRoles, selectPermissions, writeSql } = require("./services");
 const { withTimeMeasureAsync, withTimeMeasureSync } = require("./utils");
 
-const USERS_NUM = 5000;
-const POSTS_NUM = 2500;
-const COMMENTS_NUM = 10000;
-const REACTIONS_TO_POSTS_NUM = 20000;
+const USERS_NUM = 500;
+const POSTS_NUM = 250;
+const COMMENTS_NUM = 1000;
+const REACTIONS_TO_POSTS_NUM = 2000;
 
 async function insertData() {
   try {
@@ -100,12 +99,9 @@ async function insertData() {
       COMMENTS_NUM
     );
 
-    const reactions = await withTimeMeasureAsync(createReactions)();
-
     const reactionsToPosts = await withTimeMeasureAsync(createReactionsToPosts)(
       posts,
       users,
-      reactions,
       REACTIONS_TO_POSTS_NUM
     );
 
@@ -130,7 +126,6 @@ async function insertData() {
       withTimeMeasureSync(generateInsertPostsSQL)(posts),
       withTimeMeasureSync(generateInsertPostViewsSQL)(postViews),
       withTimeMeasureSync(generateInsertPostCommentsSQL)(comments),
-      withTimeMeasureSync(generateInsertReactionsSQL)(reactions),
       withTimeMeasureSync(generateInsertReactionsToPostsSQL)(reactionsToPosts),
       withTimeMeasureSync(generateFriendRequestsSQL)(friendRequests),
       withTimeMeasureSync(generateChatsSQL)(chats),

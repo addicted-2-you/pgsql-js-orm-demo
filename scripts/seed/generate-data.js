@@ -254,42 +254,24 @@ async function createComments(posts, users, n) {
   return comments;
 }
 
-const createReactions = async () => {
-  const reactions = [];
-  const reactionLabels = ["like", "dislike", "love", "gross", "anger"];
-  for (let label of reactionLabels) {
-    reactions.push({
-      id: faker.string.uuid(),
-      title: label,
-    });
-  }
-  return reactions;
-};
-
-async function createReactionsToPosts(posts, users, reactions, n) {
+async function createReactionsToPosts(posts, users, n) {
   const reactionsToPosts = [];
-  const triplets = [];
+  const reactionsMap = {}; // { [`${postId}@@${userId}`]: true }
   for (let i = 0; i < n; i++) {
     const randomPost = faker.helpers.arrayElement(posts);
     const userId = faker.helpers.arrayElement(users).id;
-    const reactionId = faker.helpers.arrayElement(reactions).id;
 
-    if (
-      !triplets.find(
-        (t) => t[0] === randomPost.id && t[1] === userId && t[2] === reactionId
-      )
-    ) {
+    if (!reactionsMap[`${randomPost.id}@@${userId}`]) {
       reactionsToPosts.push({
         id: faker.string.uuid(),
         post_id: randomPost.id,
         user_id: userId,
-        reaction_id: reactionId,
         createdAt: faker.date
           .soon({ refDate: randomPost.createdAt })
           .toISOString(),
       });
 
-      triplets.push([randomPost.id, userId, reactionId]);
+      reactionsMap[`${randomPost.id}@@${userId}`] = true;
     }
   }
   return reactionsToPosts;
@@ -434,7 +416,6 @@ module.exports = {
   createPosts,
   createPostViews,
   createComments,
-  createReactions,
   createUserAvatars,
   createUserEmails,
   createUserPhones,

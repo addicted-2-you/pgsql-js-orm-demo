@@ -148,17 +148,6 @@ const generateInsertPostCommentsSQL = (comments) => {
   return `INSERT INTO comments (id, post_id, user_id, content, created_at) VALUES\n${values};`;
 };
 
-const generateInsertReactionsSQL = (reactions) => {
-  if (!reactions.length) {
-    return "";
-  }
-
-  const values = reactions
-    .map((reaction) => `('${reaction.id}', '${reaction.title}')`)
-    .join(",\n");
-  return `INSERT INTO reactions (id, title) VALUES\n${values};`;
-};
-
 const generateInsertReactionsToPostsSQL = (reactions) => {
   if (!reactions.length) {
     return "";
@@ -167,10 +156,10 @@ const generateInsertReactionsToPostsSQL = (reactions) => {
   const values = reactions
     .map(
       (rtp) =>
-        `('${rtp.id}', '${rtp.user_id}', '${rtp.post_id}', '${rtp.reaction_id}', '${rtp.createdAt}')`
+        `('${rtp.id}', '${rtp.user_id}', '${rtp.post_id}', '${rtp.createdAt}')`
     )
     .join(",\n");
-  return `INSERT INTO reactions_to_posts (id, user_id, post_id, reaction_id, created_at) VALUES\n${values};`;
+  return `INSERT INTO reactions_to_posts (id, user_id, post_id, created_at) VALUES\n${values};`;
 };
 
 const generateFriendRequestsSQL = (friendRequests) => {
@@ -234,7 +223,6 @@ module.exports = {
   generateInsertPostsSQL,
   generateInsertPostViewsSQL,
   generateInsertPostCommentsSQL,
-  generateInsertReactionsSQL,
   generateInsertReactionsToPostsSQL,
   generateFriendRequestsSQL,
   generateChatsSQL,
