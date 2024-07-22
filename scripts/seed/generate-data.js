@@ -124,7 +124,7 @@ async function createUsers(n) {
     users.push({
       id: faker.string.uuid(),
       username,
-      password: await bcrypt.hash(username, 5),
+      password: await bcrypt.hash(username, 1), // 1 salt round is ONLY to speed up the generation, in real projects it should be about 10
     });
   }
   return users;
