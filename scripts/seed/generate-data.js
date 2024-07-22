@@ -346,6 +346,7 @@ async function createChatting(users) {
   const chats = [];
   const chatsMembers = {};
   const chatsMessages = [];
+  const existingChats = new Set();
 
   users.forEach((user) => {
     const dispersionDirection = Math.random() > 0.5 ? 1 : -1;
@@ -373,30 +374,26 @@ async function createChatting(users) {
         if (user !== randomUser.id && !chatMembersMap[randomUser.id]) {
           chatMembersMap[randomUser.id] = true;
         }
+      }
 
-        const chatMembersArray = Object.keys(chatMembersMap);
-
-        if (
-          !Object.values(chatsMembers).some((mbs) =>
-            compareObjects(chatMembersMap, mbs)
-          )
+      const chatMembersArray = Object.keys(chatMembersMap);
+      const chatMembersKey = chatMembersArray.sort().join("@@");
+      if (!existingChats.has(chatMembersKey)) {
+        for (
+          let k = 0;
+          k < Math.floor(APPROXIMATE_MESSAGES_COUNT * Math.random());
+          k += 1
         ) {
-          for (
-            let k = 0;
-            k < Math.floor(APPROXIMATE_MESSAGES_COUNT * Math.random());
-            k += 1
-          ) {
-            messages.push({
-              id: faker.string.uuid(),
-              chatId: chat.id,
-              senderId: faker.helpers.arrayElement(chatMembersArray),
-              type: "text",
-              content: sanitazeSqlString(
-                faker.word.words({ count: { min: 5, max: 15 } })
-              ),
-              createdAt: faker.date.recent().toISOString(),
-            });
-          }
+          messages.push({
+            id: faker.string.uuid(),
+            chatId: chat.id,
+            senderId: faker.helpers.arrayElement(chatMembersArray),
+            type: "text",
+            content: sanitazeSqlString(
+              faker.word.words({ count: { min: 5, max: 15 } })
+            ),
+            createdAt: faker.date.recent().toISOString(),
+          });
         }
       }
 
@@ -404,6 +401,7 @@ async function createChatting(users) {
         chats.push(chat);
         chatsMembers[chat.id] = chatMembersMap;
         chatsMessages.push(...messages);
+        existingChats.add(chatMembersKey);
       }
     }
   });
