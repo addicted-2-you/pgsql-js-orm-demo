@@ -6,6 +6,9 @@ const { sanitazeSqlString } = require("./utils");
 const APPROXIMATE_FRIENDS_COUNT = 100;
 const FRIENDS_COUNT_DISPERSION = 50;
 
+const APPROXIMATE_FOLLOWERS_COUNT = 100;
+const FOLLOWERS_COUNT_DISPERSION = 50;
+
 const APPROXIMATE_CHATS_COUNT = 5;
 const CHATS_COUNT_DISPERSION = 1;
 
@@ -14,6 +17,7 @@ const APPROXIMATE_CHAT_MEMBERS_COUNT = 10;
 const APPROXIMATE_MESSAGES_COUNT = 100;
 
 const FRIEND_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
+const FOLLOWING_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
 
 async function createUsers(n) {
   const users = [];
@@ -190,7 +194,7 @@ async function createFriendRequests(users) {
           dispersionDirection;
       i += 1
     ) {
-      const randomUser = users[Math.floor(Math.random() * users.length)];
+      const randomUser = faker.helpers.arrayElement(users);
       if (
         user.id !== randomUser.id &&
         (!friendRequestsMap[user.id] ||
@@ -202,10 +206,7 @@ async function createFriendRequests(users) {
           id: faker.string.uuid(),
           requesterId: user.id,
           receiverId: randomUser.id,
-          status:
-            FRIEND_REQUEST_STATUSES[
-              Math.floor(Math.random() * FRIEND_REQUEST_STATUSES.length)
-            ],
+          status: faker.helpers.arrayElement(FRIEND_REQUEST_STATUSES),
         });
 
         if (!friendRequestsMap[user.id]) {
@@ -218,6 +219,47 @@ async function createFriendRequests(users) {
   });
 
   return friendRequests;
+}
+
+async function createFollowRequests(users) {
+  const followRequests = [];
+  const followRequestsMap = {}; // { [followerId]: { [followeeId]: true } }
+
+  users.forEach((user) => {
+    const dispersionDirection = Math.random() > 0.5 ? 1 : -1;
+    for (
+      let i = 0;
+      i <=
+      APPROXIMATE_FOLLOWERS_COUNT +
+        Math.floor(FOLLOWERS_COUNT_DISPERSION * Math.random()) *
+          dispersionDirection;
+      i += 1
+    ) {
+      const randomUser = faker.helpers.arrayElement(users);
+      if (
+        user.id !== randomUser.id &&
+        (!followRequestsMap[user.id] ||
+          !followRequestsMap[user.id][randomUser.id]) &&
+        (!followRequestsMap[randomUser.id] ||
+          followRequestsMap[randomUser.id][user.id])
+      ) {
+        followRequests.push({
+          id: faker.string.uuid(),
+          followerId: user.id,
+          followeeId: randomUser.id,
+          status: faker.helpers.arrayElement(FOLLOWING_REQUEST_STATUSES),
+        });
+
+        if (!followRequestsMap[user.id]) {
+          followRequestsMap[user.id] = { [randomUser.id]: true };
+        } else {
+          followRequestsMap[user.id][randomUser.id] = true;
+        }
+      }
+    }
+  });
+
+  return followRequests;
 }
 
 async function createChatting(users) {
@@ -315,5 +357,6 @@ module.exports = {
   createUserPhones,
   createReactionsToPosts,
   createFriendRequests,
+  createFollowRequests,
   createChatting,
 };

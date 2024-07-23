@@ -10,6 +10,7 @@ const {
   createUserEmails,
   createUserPhones,
   createPostViews,
+  createFollowRequests,
 } = require("./generate-data");
 const {
   generateInsertUsersSQL,
@@ -24,6 +25,7 @@ const {
   generateInsertUserEmailsSQL,
   generateInsertUserPhonesSQL,
   generateInsertPostViewsSQL,
+  generateFollowingRequestsSQL,
 } = require("./generate-sql");
 const { writeSql } = require("./services");
 const { withTimeMeasureAsync, withTimeMeasureSync } = require("./utils");
@@ -65,6 +67,10 @@ async function insertData() {
       users
     );
 
+    const followingRequests = await withTimeMeasureAsync(createFollowRequests)(
+      users
+    );
+
     const { chats, chatsMembers, chatsMessages } = await withTimeMeasureAsync(
       createChatting
     )(users);
@@ -79,6 +85,7 @@ async function insertData() {
       withTimeMeasureSync(generateInsertPostCommentsSQL)(comments),
       withTimeMeasureSync(generateInsertReactionsToPostsSQL)(reactionsToPosts),
       withTimeMeasureSync(generateFriendRequestsSQL)(friendRequests),
+      withTimeMeasureSync(generateFollowingRequestsSQL)(followingRequests),
       withTimeMeasureSync(generateChatsSQL)(chats),
       withTimeMeasureSync(generateChatMembersSQL)(chatsMembers),
       withTimeMeasureSync(generateMessagesSQL)(chatsMessages),

@@ -121,6 +121,20 @@ const generateFriendRequestsSQL = (friendRequests) => {
   return `INSERT INTO friend_requests (id, requester_id, receiver_id, status) VALUES\n${values};`;
 };
 
+const generateFollowingRequestsSQL = (followingRequests) => {
+  if (!followingRequests.length) {
+    return "";
+  }
+
+  const values = followingRequests
+    .map(
+      (fr) =>
+        `('${fr.id}', '${fr.followerId}', '${fr.followeeId}', '${fr.status}')`
+    )
+    .join(",\n");
+  return `INSERT INTO follow_requests (id, follower_id, followee_id, status) VALUES\n${values};`;
+};
+
 const generateChatsSQL = (chats) => {
   if (!chats.length) {
     return "";
@@ -165,6 +179,7 @@ module.exports = {
   generateInsertPostCommentsSQL,
   generateInsertReactionsToPostsSQL,
   generateFriendRequestsSQL,
+  generateFollowingRequestsSQL,
   generateChatsSQL,
   generateChatMembersSQL,
   generateMessagesSQL,
