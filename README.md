@@ -2,3 +2,5 @@
 2. `cd ./scripts`
 3. `npm i`
 4. `npm run seed`
+
+## [Requirements](./requirements/index.md)
