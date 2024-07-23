@@ -16,6 +16,8 @@ The app is a Twitter-like social network
 
 ### [Group Chats](./group-chats.md)
 
+### [Messaging](./messaging.md)
+
 ### [Post Management](./post-management.md)
 
 ### [Profile Management](./profile-management.md)

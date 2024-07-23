@@ -22,4 +22,6 @@ If both chat members deleted it, the chat will be deleted forever.
 
 ### [Friending](./friending.md)
 
+### [Messaging](./messaging.md)
+
 ### [User Blocking](./user-blocking.md)
