@@ -49,61 +49,6 @@ const generateInsertUserPhonesSQL = (userPhones) => {
   return `INSERT INTO user_phones (id, user_id, phone, is_verified) VALUES\n${values};`;
 };
 
-const generateInsertPermissionsSQL = (permissions) => {
-  if (!permissions.length) {
-    return "";
-  }
-
-  const values = permissions
-    .map((permission) => `('${permission.id}', '${permission.title}')`)
-    .join(",\n");
-  return `INSERT INTO permissions (id, title) VALUES\n${values};`;
-};
-
-const generateInsertRolesSQL = (roles) => {
-  if (!roles.length) {
-    return "";
-  }
-
-  const values = roles
-    .map((role) => `('${role.id}', '${role.title}')`)
-    .join(",\n");
-  return `INSERT INTO roles (id, title) VALUES\n${values};`;
-};
-
-const generateInsertRolePermissionsSQL = (rolePermissions) => {
-  if (!rolePermissions.length) {
-    return "";
-  }
-
-  const values = rolePermissions
-    .map((rp) => `('${rp.role_id}', '${rp.permission_id}')`)
-    .join(",\n");
-  return `INSERT INTO role_permissions (role_id, permission_id) VALUES\n${values};`;
-};
-
-const generateInsertUserRolesSQL = (userRoles) => {
-  if (!userRoles.length) {
-    return "";
-  }
-
-  const values = userRoles
-    .map((ur) => `('${ur.user_id}', '${ur.role_id}')`)
-    .join(",\n");
-  return `INSERT INTO user_roles (user_id, role_id) VALUES\n${values};`;
-};
-
-const generateInsertUserPermissionsSQL = (userPermissions) => {
-  if (!userPermissions.length) {
-    return "";
-  }
-
-  const values = userPermissions
-    .map((up) => `('${up.user_id}', '${up.permission_id}')`)
-    .join(",\n");
-  return `INSERT INTO user_permissions (user_id, permission_id) VALUES\n${values};`;
-};
-
 const generateInsertPostsSQL = (posts) => {
   if (!posts.length) {
     return "";
@@ -215,11 +160,6 @@ module.exports = {
   generateInsertUserAvatarsSQL,
   generateInsertUserEmailsSQL,
   generateInsertUserPhonesSQL,
-  generateInsertPermissionsSQL,
-  generateInsertRolesSQL,
-  generateInsertRolePermissionsSQL,
-  generateInsertUserRolesSQL,
-  generateInsertUserPermissionsSQL,
   generateInsertPostsSQL,
   generateInsertPostViewsSQL,
   generateInsertPostCommentsSQL,

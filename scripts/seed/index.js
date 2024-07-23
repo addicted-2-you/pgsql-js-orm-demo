@@ -3,14 +3,8 @@ const {
   createUsers,
   createPosts,
   createComments,
-  createReactions,
   createUserAvatars,
   createReactionsToPosts,
-  createUserPermissions,
-  createPermissions,
-  createRolePermissions,
-  createUserRoles,
-  createRoles,
   createFriendRequests,
   createChatting,
   createUserEmails,
@@ -20,11 +14,6 @@ const {
 const {
   generateInsertUsersSQL,
   generateInsertUserAvatarsSQL,
-  generateInsertPermissionsSQL,
-  generateInsertRolesSQL,
-  generateInsertRolePermissionsSQL,
-  generateInsertUserRolesSQL,
-  generateInsertUserPermissionsSQL,
   generateInsertPostsSQL,
   generateInsertPostCommentsSQL,
   generateInsertReactionsToPostsSQL,
@@ -36,7 +25,7 @@ const {
   generateInsertUserPhonesSQL,
   generateInsertPostViewsSQL,
 } = require("./generate-sql");
-const { selectRoles, selectPermissions, writeSql } = require("./services");
+const { writeSql } = require("./services");
 const { withTimeMeasureAsync, withTimeMeasureSync } = require("./utils");
 
 const USERS_NUM = 500;
@@ -55,39 +44,6 @@ async function insertData() {
     const emails = await withTimeMeasureAsync(createUserEmails)(users);
 
     const phones = await withTimeMeasureAsync(createUserPhones)(users);
-
-    let permissions = [];
-    let roles = [];
-    let rolePermissions = [];
-    let userRoles = [];
-    let userPermissions = [];
-
-    const existingRoles = await withTimeMeasureAsync(selectRoles)();
-    if (existingRoles.length) {
-      const existingPermissions = await withTimeMeasureAsync(
-        selectPermissions
-      )();
-      userRoles = await withTimeMeasureAsync(createUserRoles)(
-        users,
-        existingRoles
-      );
-      userPermissions = await withTimeMeasureAsync(createUserPermissions)(
-        users,
-        existingPermissions
-      );
-    } else {
-      permissions = await withTimeMeasureAsync(createPermissions)();
-      roles = await withTimeMeasureAsync(createRoles)();
-      rolePermissions = await withTimeMeasureAsync(createRolePermissions)(
-        roles,
-        permissions
-      );
-      userRoles = await withTimeMeasureAsync(createUserRoles)(users, roles);
-      userPermissions = await withTimeMeasureAsync(createUserPermissions)(
-        users,
-        permissions
-      );
-    }
 
     const posts = await withTimeMeasureAsync(createPosts)(users, POSTS_NUM);
 
@@ -118,11 +74,6 @@ async function insertData() {
       withTimeMeasureSync(generateInsertUserAvatarsSQL)(avatars),
       withTimeMeasureSync(generateInsertUserEmailsSQL)(emails),
       withTimeMeasureSync(generateInsertUserPhonesSQL)(phones),
-      withTimeMeasureSync(generateInsertPermissionsSQL)(permissions),
-      withTimeMeasureSync(generateInsertRolesSQL)(roles),
-      withTimeMeasureSync(generateInsertRolePermissionsSQL)(rolePermissions),
-      withTimeMeasureSync(generateInsertUserRolesSQL)(userRoles),
-      withTimeMeasureSync(generateInsertUserPermissionsSQL)(userPermissions),
       withTimeMeasureSync(generateInsertPostsSQL)(posts),
       withTimeMeasureSync(generateInsertPostViewsSQL)(postViews),
       withTimeMeasureSync(generateInsertPostCommentsSQL)(comments),

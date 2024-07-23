@@ -1,51 +1,7 @@
 const { faker } = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 
-const { sanitazeSqlString, compareObjects } = require("./utils");
-
-const POST_PERMISSION_TITLES = ["create_post", "delete_any_post"];
-
-const COMMENTS_PERMISSION_TITLES = ["create_comment", "delete_any_comment"];
-
-const REACTIONS_PERMISSION_TITLES = [
-  "create_reaction",
-  "create_post_reaction",
-  "create_comment_reaction",
-];
-
-const PERMISSIONS_PERMISSION_TITLES = [
-  "create_permissions",
-  "update_permissions",
-  "delete_permissions",
-];
-
-const USERS_PERMISSION_TITLES = [
-  "create_users",
-  "update_users",
-  "delete_users",
-  "ban_users",
-];
-
-const PERMISSION_TITLES = [
-  ...POST_PERMISSION_TITLES,
-  ...COMMENTS_PERMISSION_TITLES,
-  ...REACTIONS_PERMISSION_TITLES,
-  ...PERMISSIONS_PERMISSION_TITLES,
-  ...USERS_PERMISSION_TITLES,
-];
-
-const ROLES_PERMISSIONS = {
-  "Super Admin": [...PERMISSION_TITLES],
-  Admin: [
-    ...POST_PERMISSION_TITLES,
-    ...COMMENTS_PERMISSION_TITLES,
-    ...REACTIONS_PERMISSION_TITLES,
-    ...USERS_PERMISSION_TITLES,
-  ],
-  User: ["create_comment", ...REACTIONS_PERMISSION_TITLES],
-  "Content Creator": ["create_post"],
-  Viewer: [],
-};
+const { sanitazeSqlString } = require("./utils");
 
 const APPROXIMATE_FRIENDS_COUNT = 100;
 const FRIENDS_COUNT_DISPERSION = 50;
@@ -58,63 +14,6 @@ const APPROXIMATE_CHAT_MEMBERS_COUNT = 10;
 const APPROXIMATE_MESSAGES_COUNT = 100;
 
 const FRIEND_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
-
-const createPermissions = async () => {
-  const permissions = [];
-
-  PERMISSION_TITLES.forEach((title) => {
-    permissions.push({
-      id: faker.string.uuid(),
-      title,
-    });
-  });
-
-  return permissions;
-};
-
-const createRoles = async () => {
-  const roles = [];
-
-  Object.keys(ROLES_PERMISSIONS).forEach((title) => {
-    roles.push({
-      id: faker.string.uuid(),
-      title,
-    });
-  });
-
-  return roles;
-};
-
-const createRolePermissions = async (roles, permissions) => {
-  const rolePermissions = [];
-
-  roles.forEach((role) => {
-    ROLES_PERMISSIONS[role.title].forEach((permission) => {
-      rolePermissions.push({
-        role_id: role.id,
-        permission_id: permissions.find((p) => p.title === permission).id,
-      });
-    });
-  });
-
-  return rolePermissions;
-};
-
-const createUserRoles = async (users, roles) => {
-  const userRoles = [];
-  const userRoleId = roles.find((r) => r.title === "User").id;
-
-  users.forEach((user) => {
-    userRoles.push({
-      user_id: user.id,
-      role_id: userRoleId,
-    });
-  });
-
-  return userRoles;
-};
-
-const createUserPermissions = async () => [];
 
 async function createUsers(n) {
   const users = [];
@@ -406,11 +305,6 @@ async function createChatting(users) {
 }
 
 module.exports = {
-  createPermissions,
-  createRoles,
-  createRolePermissions,
-  createUserRoles,
-  createUserPermissions,
   createUsers,
 
   createPosts,
