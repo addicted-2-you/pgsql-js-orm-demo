@@ -98,6 +98,18 @@ CREATE TABLE friend_requests (
   UNIQUE (requester_id, receiver_id)
 );
 
+CREATE TABLE follow_requests (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  follower_id UUID NOT NULL,
+  followee_id UUID NOT NULL,
+  status VARCHAR(63) NOT NULL CHECK (status IN ('pending', 'accepted', 'rejected')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (followee_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  UNIQUE (follower_id, followee_id)
+);
+
 CREATE TABLE chats (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name VARCHAR(255),
