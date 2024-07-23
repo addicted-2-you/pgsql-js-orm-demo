@@ -29,3 +29,5 @@ Non-Admins should not have access to ANY admin related functionality.
   - The admin should be able to mark report as "In Progress", "Resolved", "Cancelled", and leave comments
 
 ## References
+
+### [Reporting](./reporting.md)

@@ -25,3 +25,5 @@
 ### [DMs](./dms.md)
 
 ### [Group Chats](./group-chats.md)
+
+### [Reporting](./reporting.md)

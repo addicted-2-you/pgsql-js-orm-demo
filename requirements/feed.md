@@ -4,16 +4,16 @@
 
 The feed should be +- unique -- on every load it should be slightly different
 
-#### The user should always have something in their feed
+### The user should always have something in their feed
 
 The feed suggestion should have priority
 - posts from their folowees
 - popular posts (many likes, many views)
 - posts from popular users (many followers)
 
-#### The user should be able to remove any post from their feed
+### The user should be able to remove any post from their feed
 
-Reporting the post should automatically remove it from the reporter's feed
+### The user should be able to report any post from their feed
 
 ### Blocking a user will remove their posts from the blocker's feed
 
@@ -24,3 +24,5 @@ Reporting the post should automatically remove it from the reporter's feed
 ### [User Blocking](./user-blocking.md)
 
 ### [Profile Management](./profile-management.md)
+
+### [Reporting](./reporting.md)

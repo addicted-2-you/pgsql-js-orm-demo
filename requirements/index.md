@@ -26,6 +26,8 @@ The app is a Twitter-like social network
 
 ### [Profile Management](./profile-management.md)
 
+### [Reporting](./reporting.md)
+
 ### [User Blocking](./user-blocking.md)
 
 ### [User Search](./user-search.md)

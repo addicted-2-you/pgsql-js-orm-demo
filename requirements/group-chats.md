@@ -33,3 +33,5 @@
 ### [Group Chat Roles](./group-chat-roles.md)
 
 ### [User Blocking](./user-blocking.md)
+
+### [Reporting](./reporting.md)

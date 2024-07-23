@@ -20,3 +20,7 @@ The post should include the following
 ### The user should be able to view the likes count of the post
 
 ## References
+
+### [Feed](./feed.md)
+
+### [Reporting](./reporting.md)
