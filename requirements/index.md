@@ -2,6 +2,8 @@ The app is a Twitter-like social network
 
 ## References
 
+### [Admin Panel](./admin-panel.md)
+
 ### [Chatting](./chatting.md)
 
 ### [DMs](./dms.md)

@@ -2,8 +2,6 @@
 
 ## Friend Suggestion
 
-## Global Admin Panel
-
 ## Online Indicators
 
 ## Typing Indicators
