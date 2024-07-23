@@ -6,6 +6,8 @@ The app is a Twitter-like social network
 
 ### [DMs](./dms.md)
 
+### [Feature Requests](./feature-requests.md)
+
 ### [Feed](./feed.md)
 
 ### [Following](./following.md)
