@@ -1,14 +1,14 @@
-## Part 1
+## Part 1 (basics)
 
-- [ ] setup the project;
-  - [ ] configure nest;
-  - [ ] configure orm;
+- [x] setup the project;
+  - [x] configure nest;
+  - [x] configure orm;
 
-- [] add auth;
-  - [ ] add signing up;
-  - [ ] add signing in;
-  - [ ] add basic guards;
+- [x] add auth;
+  - [x] add signing up;
+  - [x] add signing in;
+  - [x] add basic guards;
 
-## Part 2
+## Part 2 (basic admin routes, user cruds)
 
 - [ ] add personalized feed v1 (no caching);
