@@ -11,7 +11,7 @@
 
 ## Part 2 (basic admin routes, user cruds)
 
-- [ ] add admin guard
+- [x] add admin guard
 
 - [x] add user cruds (admin only)
   - [x] list all

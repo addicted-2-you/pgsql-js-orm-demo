@@ -9,11 +9,13 @@ import {
   Patch,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AdminUsersService } from './admin-users.service';
 import { UserSearchDto } from './dto/user-search.dto';
 import { UserUpdateDto } from './dto/user-update.dto';
+import { AdminGuard } from 'src/auth/admin.guard';
 
 @Controller('admin/users')
 @ApiTags('admin/user')
@@ -21,6 +23,8 @@ export class AdminUsersController {
   constructor(private adminUsersService: AdminUsersService) {}
 
   @Get()
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   async getUsers(
     @Query()
     query: UserSearchDto,
@@ -29,6 +33,8 @@ export class AdminUsersController {
   }
 
   @Patch(':id')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   async updateUser(
     @Param('id') id: string,
     @Body() userUpdateDto: UserUpdateDto,
@@ -50,6 +56,8 @@ export class AdminUsersController {
   }
 
   @Put('restore/:id')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   async unarchiveUser(@Param('id') id: string) {
     const user = await this.adminUsersService.findOne(id);
     if (!user) {
@@ -60,6 +68,8 @@ export class AdminUsersController {
   }
 
   @Delete(':id')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   async archiveUser(@Param('id') id: string) {
     const user = await this.adminUsersService.findOne(id);
     if (!user) {
@@ -70,6 +80,8 @@ export class AdminUsersController {
   }
 
   @Delete(':id/hard')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   async destroyUser(@Param('id') id: string) {
     const user = await this.adminUsersService.findOne(id);
     if (!user) {
