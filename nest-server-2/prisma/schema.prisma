@@ -66,24 +66,13 @@ model messages {
   users      users     @relation(fields: [sender_id], references: [id], onDelete: Cascade)
 }
 
-model permissions {
-  id               String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  title            String             @db.VarChar(255)
-  created_at       DateTime?          @default(now()) @db.Timestamp(6)
-  updated_at       DateTime?          @default(now()) @db.Timestamp(6)
-  deleted_at       DateTime?          @db.Timestamp(6)
-  role_permissions role_permissions[]
-  user_permissions user_permissions[]
-}
-
 model post_views {
-  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  post_id    String    @db.Uuid
-  user_id    String?   @db.Uuid
-  viewed_at  DateTime? @default(now()) @db.Timestamp(6)
-  reply_post String?   @db.Uuid
-  posts      posts     @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  users      users?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id        String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  post_id   String    @db.Uuid
+  user_id   String?   @db.Uuid
+  viewed_at DateTime? @default(now()) @db.Timestamp(6)
+  posts     posts     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  users     users?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model posts {
@@ -100,45 +89,17 @@ model posts {
   reactions_to_posts reactions_to_posts[]
 }
 
-model reactions {
-  id                 String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  title              String               @db.VarChar(255)
-  created_at         DateTime?            @default(now()) @db.Timestamp(6)
-  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
-  deleted_at         DateTime?            @db.Timestamp(6)
-  reactions_to_posts reactions_to_posts[]
-}
-
 model reactions_to_posts {
-  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id     String    @db.Uuid
-  post_id     String    @db.Uuid
-  reaction_id String    @db.Uuid
-  created_at  DateTime? @default(now()) @db.Timestamp(6)
-  updated_at  DateTime? @default(now()) @db.Timestamp(6)
-  deleted_at  DateTime? @db.Timestamp(6)
-  posts       posts     @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  reactions   reactions @relation(fields: [reaction_id], references: [id], onDelete: Cascade)
-  users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-}
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String    @db.Uuid
+  post_id    String    @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
+  posts      posts     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-model role_permissions {
-  role_id       String      @db.Uuid
-  permission_id String      @db.Uuid
-  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade)
-  roles         roles       @relation(fields: [role_id], references: [id], onDelete: Cascade)
-
-  @@id([role_id, permission_id])
-}
-
-model roles {
-  id               String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  title            String             @db.VarChar(255)
-  created_at       DateTime?          @default(now()) @db.Timestamp(6)
-  updated_at       DateTime?          @default(now()) @db.Timestamp(6)
-  deleted_at       DateTime?          @db.Timestamp(6)
-  role_permissions role_permissions[]
-  user_roles       user_roles[]
+  @@unique([user_id, post_id])
 }
 
 model user_avatars {
@@ -162,15 +123,6 @@ model user_emails {
   users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_user_email")
 }
 
-model user_permissions {
-  user_id       String      @db.Uuid
-  permission_id String      @db.Uuid
-  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade)
-  users         users       @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@id([user_id, permission_id])
-}
-
 model user_phones {
   id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   user_id     String    @db.Uuid
@@ -182,24 +134,18 @@ model user_phones {
   users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_user_phone")
 }
 
-model user_roles {
-  user_id String @db.Uuid
-  role_id String @db.Uuid
-  roles   roles  @relation(fields: [role_id], references: [id], onDelete: Cascade)
-  users   users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@id([user_id, role_id])
-}
-
 model users {
   id                                                  String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   username                                            String               @db.VarChar(255)
   password                                            String               @db.VarChar(255)
+  is_admin                                            Boolean?             @default(false)
   created_at                                          DateTime?            @default(now()) @db.Timestamp(6)
-  updated_at                                          DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at                                          DateTime?            @default(now()) @updatedAt @db.Timestamp(6)
   deleted_at                                          DateTime?            @db.Timestamp(6)
   chat_members                                        chat_members[]
   comments                                            comments[]
+  follow_requests_follow_requests_followee_idTousers  follow_requests[]    @relation("follow_requests_followee_idTousers")
+  follow_requests_follow_requests_follower_idTousers  follow_requests[]    @relation("follow_requests_follower_idTousers")
   friend_requests_friend_requests_receiver_idTousers  friend_requests[]    @relation("friend_requests_receiver_idTousers")
   friend_requests_friend_requests_requester_idTousers friend_requests[]    @relation("friend_requests_requester_idTousers")
   messages                                            messages[]
@@ -208,7 +154,19 @@ model users {
   reactions_to_posts                                  reactions_to_posts[]
   user_avatars                                        user_avatars?
   user_emails                                         user_emails[]
-  user_permissions                                    user_permissions[]
   user_phones                                         user_phones[]
-  user_roles                                          user_roles[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model follow_requests {
+  id                                       String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  follower_id                              String    @db.Uuid
+  followee_id                              String    @db.Uuid
+  status                                   String    @db.VarChar(63)
+  created_at                               DateTime? @default(now()) @db.Timestamp(6)
+  updated_at                               DateTime? @default(now()) @db.Timestamp(6)
+  users_follow_requests_followee_idTousers users     @relation("follow_requests_followee_idTousers", fields: [followee_id], references: [id], onDelete: Cascade)
+  users_follow_requests_follower_idTousers users     @relation("follow_requests_follower_idTousers", fields: [follower_id], references: [id], onDelete: Cascade)
+
+  @@unique([follower_id, followee_id])
 }

@@ -1,0 +1,48 @@
+## Part 1 (basics)
+
+- [x] setup the project;
+  - [x] configure nest;
+  - [x] configure orm;
+
+- [x] add auth;
+  - [x] add signing up;
+  - [x] add signing in;
+  - [x] add basic guards;
+
+## Part 2 (basic admin routes, user cruds)
+
+- [x] add admin guard
+
+- [x] add user cruds (admin only)
+  - [x] list all
+    - [x] search by username
+      - [x] partial search
+    - [x] have it paginated
+  - [x] update password
+  - [x] archive
+  - [x] unarchive
+  - [x] destroy
+
+## Part 3 (posts)
+
+- [ ] add post cruds (admin only)
+  - [ ] list all
+      - [ ] search by title
+        - [ ] partial search
+        - [ ] should be typo-tolerant
+        - [ ] should be case-tolerant
+      - [ ] search by content
+        - [ ] partial search
+        - [ ] should be typo-tolerant
+        - [ ] should be case-tolerant
+      - [ ] filter by `deleted_at`
+      - [ ] have it paginated
+  - [ ] archive
+  - [ ] unarchive
+  - [ ] destroy
+
+
+
+## Part 4 (feed)
+
+- [ ] add personalized feed v1 (no caching)
