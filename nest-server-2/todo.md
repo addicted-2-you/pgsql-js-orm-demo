@@ -18,7 +18,7 @@
     - [x] search by username
       - [x] partial search
     - [x] have it paginated
-  - [ ] update password
+  - [x] update password
   - [ ] archive
   - [ ] unarchive
   - [ ] destroy

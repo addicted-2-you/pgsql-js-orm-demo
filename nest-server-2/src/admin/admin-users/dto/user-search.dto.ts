@@ -10,7 +10,7 @@ import {
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
-export class SearchParamsDto {
+export class UserSearchDto {
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({
@@ -30,7 +30,7 @@ export class SearchParamsDto {
   })
   @ApiPropertyOptional({
     description: 'Optional search parameter for filtering by admin status',
-    example: 'true',
+    example: 'false',
   })
   is_admin?: boolean;
 

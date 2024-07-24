@@ -1,16 +1,18 @@
+import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { UserDbDto } from 'src/users/dto/user-db.dto';
 
-import { SearchParamsDto } from './dto/user-search.dto';
+import { UserSearchDto } from './dto/user-search.dto';
 import { Prisma } from '@prisma/client';
+import { UserUpdateDto } from './dto/user-update.dto';
 
 @Injectable()
 export class AdminUsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(params: SearchParamsDto): Promise<UserDbDto[]> {
+  async findAll(params: UserSearchDto): Promise<UserDbDto[]> {
     const {
       username,
       is_admin,
@@ -39,6 +41,24 @@ export class AdminUsersService {
       orderBy,
       skip: (page_number - 1) * page_size,
       take: page_size,
+    });
+  }
+
+  async findOne(id: string) {
+    return await this.prisma.users.findFirst({ where: { id } });
+  }
+
+  async updateOne(id: string, userUpdateDto: UserUpdateDto) {
+    if (userUpdateDto.password) {
+      userUpdateDto.password = await bcrypt.hash(
+        userUpdateDto.password,
+        +process.env.SALT_ROUNDS,
+      );
+    }
+
+    return await this.prisma.users.update({
+      where: { id },
+      data: userUpdateDto,
     });
   }
 }
