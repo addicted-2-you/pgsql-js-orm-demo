@@ -1,54 +1,13 @@
 const { faker } = require("@faker-js/faker");
 const bcrypt = require("bcrypt");
 
-const { sanitazeSqlString, compareObjects } = require("./utils");
-
-const POST_PERMISSION_TITLES = ["create_post", "delete_any_post"];
-
-const COMMENTS_PERMISSION_TITLES = ["create_comment", "delete_any_comment"];
-
-const REACTIONS_PERMISSION_TITLES = [
-  "create_reaction",
-  "create_post_reaction",
-  "create_comment_reaction",
-];
-
-const PERMISSIONS_PERMISSION_TITLES = [
-  "create_permissions",
-  "update_permissions",
-  "delete_permissions",
-];
-
-const USERS_PERMISSION_TITLES = [
-  "create_users",
-  "update_users",
-  "delete_users",
-  "ban_users",
-];
-
-const PERMISSION_TITLES = [
-  ...POST_PERMISSION_TITLES,
-  ...COMMENTS_PERMISSION_TITLES,
-  ...REACTIONS_PERMISSION_TITLES,
-  ...PERMISSIONS_PERMISSION_TITLES,
-  ...USERS_PERMISSION_TITLES,
-];
-
-const ROLES_PERMISSIONS = {
-  "Super Admin": [...PERMISSION_TITLES],
-  Admin: [
-    ...POST_PERMISSION_TITLES,
-    ...COMMENTS_PERMISSION_TITLES,
-    ...REACTIONS_PERMISSION_TITLES,
-    ...USERS_PERMISSION_TITLES,
-  ],
-  User: ["create_comment", ...REACTIONS_PERMISSION_TITLES],
-  "Content Creator": ["create_post"],
-  Viewer: [],
-};
+const { sanitazeSqlString } = require("./utils");
 
 const APPROXIMATE_FRIENDS_COUNT = 100;
 const FRIENDS_COUNT_DISPERSION = 50;
+
+const APPROXIMATE_FOLLOWERS_COUNT = 100;
+const FOLLOWERS_COUNT_DISPERSION = 50;
 
 const APPROXIMATE_CHATS_COUNT = 5;
 const CHATS_COUNT_DISPERSION = 1;
@@ -58,63 +17,7 @@ const APPROXIMATE_CHAT_MEMBERS_COUNT = 10;
 const APPROXIMATE_MESSAGES_COUNT = 100;
 
 const FRIEND_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
-
-const createPermissions = async () => {
-  const permissions = [];
-
-  PERMISSION_TITLES.forEach((title) => {
-    permissions.push({
-      id: faker.string.uuid(),
-      title,
-    });
-  });
-
-  return permissions;
-};
-
-const createRoles = async () => {
-  const roles = [];
-
-  Object.keys(ROLES_PERMISSIONS).forEach((title) => {
-    roles.push({
-      id: faker.string.uuid(),
-      title,
-    });
-  });
-
-  return roles;
-};
-
-const createRolePermissions = async (roles, permissions) => {
-  const rolePermissions = [];
-
-  roles.forEach((role) => {
-    ROLES_PERMISSIONS[role.title].forEach((permission) => {
-      rolePermissions.push({
-        role_id: role.id,
-        permission_id: permissions.find((p) => p.title === permission).id,
-      });
-    });
-  });
-
-  return rolePermissions;
-};
-
-const createUserRoles = async (users, roles) => {
-  const userRoles = [];
-  const userRoleId = roles.find((r) => r.title === "User").id;
-
-  users.forEach((user) => {
-    userRoles.push({
-      user_id: user.id,
-      role_id: userRoleId,
-    });
-  });
-
-  return userRoles;
-};
-
-const createUserPermissions = async () => [];
+const FOLLOWING_REQUEST_STATUSES = ["pending", "accepted", "rejected"];
 
 async function createUsers(n) {
   const users = [];
@@ -291,7 +194,7 @@ async function createFriendRequests(users) {
           dispersionDirection;
       i += 1
     ) {
-      const randomUser = users[Math.floor(Math.random() * users.length)];
+      const randomUser = faker.helpers.arrayElement(users);
       if (
         user.id !== randomUser.id &&
         (!friendRequestsMap[user.id] ||
@@ -303,10 +206,7 @@ async function createFriendRequests(users) {
           id: faker.string.uuid(),
           requesterId: user.id,
           receiverId: randomUser.id,
-          status:
-            FRIEND_REQUEST_STATUSES[
-              Math.floor(Math.random() * FRIEND_REQUEST_STATUSES.length)
-            ],
+          status: faker.helpers.arrayElement(FRIEND_REQUEST_STATUSES),
         });
 
         if (!friendRequestsMap[user.id]) {
@@ -319,6 +219,47 @@ async function createFriendRequests(users) {
   });
 
   return friendRequests;
+}
+
+async function createFollowRequests(users) {
+  const followRequests = [];
+  const followRequestsMap = {}; // { [followerId]: { [followeeId]: true } }
+
+  users.forEach((user) => {
+    const dispersionDirection = Math.random() > 0.5 ? 1 : -1;
+    for (
+      let i = 0;
+      i <=
+      APPROXIMATE_FOLLOWERS_COUNT +
+        Math.floor(FOLLOWERS_COUNT_DISPERSION * Math.random()) *
+          dispersionDirection;
+      i += 1
+    ) {
+      const randomUser = faker.helpers.arrayElement(users);
+      if (
+        user.id !== randomUser.id &&
+        (!followRequestsMap[user.id] ||
+          !followRequestsMap[user.id][randomUser.id]) &&
+        (!followRequestsMap[randomUser.id] ||
+          followRequestsMap[randomUser.id][user.id])
+      ) {
+        followRequests.push({
+          id: faker.string.uuid(),
+          followerId: user.id,
+          followeeId: randomUser.id,
+          status: faker.helpers.arrayElement(FOLLOWING_REQUEST_STATUSES),
+        });
+
+        if (!followRequestsMap[user.id]) {
+          followRequestsMap[user.id] = { [randomUser.id]: true };
+        } else {
+          followRequestsMap[user.id][randomUser.id] = true;
+        }
+      }
+    }
+  });
+
+  return followRequests;
 }
 
 async function createChatting(users) {
@@ -406,11 +347,6 @@ async function createChatting(users) {
 }
 
 module.exports = {
-  createPermissions,
-  createRoles,
-  createRolePermissions,
-  createUserRoles,
-  createUserPermissions,
   createUsers,
 
   createPosts,
@@ -421,5 +357,6 @@ module.exports = {
   createUserPhones,
   createReactionsToPosts,
   createFriendRequests,
+  createFollowRequests,
   createChatting,
 };

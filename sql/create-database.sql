@@ -4,6 +4,7 @@ CREATE TABLE users (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
+  is_admin BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   deleted_at TIMESTAMP
@@ -85,47 +86,6 @@ CREATE TABLE reactions_to_posts (
   UNIQUE (user_id, post_id)
 );
 
-CREATE TABLE permissions (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  deleted_at TIMESTAMP
-);
-
-CREATE TABLE roles (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  deleted_at TIMESTAMP
-);
-
-CREATE TABLE role_permissions (
-  role_id UUID NOT NULL,
-  permission_id UUID NOT NULL,
-  PRIMARY KEY (role_id, permission_id),
-  FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE ON UPDATE CASCADE
-  
-);
-
-CREATE TABLE user_roles (
-  user_id UUID NOT NULL,
-  role_id UUID NOT NULL,
-  PRIMARY KEY (user_id, role_id),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE user_permissions (
-  user_id UUID NOT NULL,
-  permission_id UUID NOT NULL,
-  PRIMARY KEY (user_id, permission_id),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 CREATE TABLE friend_requests (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   requester_id UUID NOT NULL,
@@ -136,6 +96,18 @@ CREATE TABLE friend_requests (
   FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE (requester_id, receiver_id)
+);
+
+CREATE TABLE follow_requests (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  follower_id UUID NOT NULL,
+  followee_id UUID NOT NULL,
+  status VARCHAR(63) NOT NULL CHECK (status IN ('pending', 'accepted', 'rejected')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (followee_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  UNIQUE (follower_id, followee_id)
 );
 
 CREATE TABLE chats (
