@@ -11,18 +11,17 @@
 
 ## Part 2 (basic admin routes, user cruds)
 
-- [ ] add admin guard
+- [x] add admin guard
 
-- [ ] add user cruds (admin only)
-  - [ ] list all
-    - [ ] search by username
-      - [ ] partial search
-    - [ ] filter by `deleted_at`
-    - [ ] have it paginated
-  - [ ] update password
-  - [ ] archive
-  - [ ] unarchive
-  - [ ] destroy
+- [x] add user cruds (admin only)
+  - [x] list all
+    - [x] search by username
+      - [x] partial search
+    - [x] have it paginated
+  - [x] update password
+  - [x] archive
+  - [x] unarchive
+  - [x] destroy
 
 ## Part 3 (posts)
 
