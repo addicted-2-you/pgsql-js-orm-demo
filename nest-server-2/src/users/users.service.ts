@@ -9,6 +9,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  async findAll() {
+    return await this.prisma.users.findMany({});
+  }
+
   async findOne(id: string) {
     return await this.prisma.users.findFirst({ where: { id } });
   }
