@@ -61,4 +61,28 @@ export class AdminUsersService {
       data: userUpdateDto,
     });
   }
+
+  async softDeleteOne(id: string) {
+    return await this.prisma.users.update({
+      where: { id },
+      data: {
+        deleted_at: new Date(),
+      },
+    });
+  }
+
+  async restoreOne(id: string) {
+    return await this.prisma.users.update({
+      where: { id },
+      data: {
+        deleted_at: null,
+      },
+    });
+  }
+
+  async destroyOne(id: string) {
+    return await this.prisma.users.delete({
+      where: { id },
+    });
+  }
 }

@@ -13,15 +13,15 @@
 
 - [ ] add admin guard
 
-- [ ] add user cruds (admin only)
+- [x] add user cruds (admin only)
   - [x] list all
     - [x] search by username
       - [x] partial search
     - [x] have it paginated
   - [x] update password
-  - [ ] archive
-  - [ ] unarchive
-  - [ ] destroy
+  - [x] archive
+  - [x] unarchive
+  - [x] destroy
 
 ## Part 3 (posts)
 
