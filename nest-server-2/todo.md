@@ -14,11 +14,10 @@
 - [ ] add admin guard
 
 - [ ] add user cruds (admin only)
-  - [ ] list all
-    - [ ] search by username
-      - [ ] partial search
-    - [ ] filter by `deleted_at`
-    - [ ] have it paginated
+  - [x] list all
+    - [x] search by username
+      - [x] partial search
+    - [x] have it paginated
   - [ ] update password
   - [ ] archive
   - [ ] unarchive
