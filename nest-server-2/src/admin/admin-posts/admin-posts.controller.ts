@@ -41,6 +41,8 @@ export class AdminPostsController {
     if (!post) {
       throw new NotFoundException(`Post with id ${id} not found`);
     }
+
+    return post;
   }
 
   @Patch(':id')
