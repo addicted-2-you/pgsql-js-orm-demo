@@ -3,6 +3,7 @@ import { PostDbDto } from 'src/posts/dto/post-db.dto';
 import { PrismaService } from 'src/prisma.service';
 import { PostSearchDto } from './dto/post-search.dto';
 import { Prisma } from '@prisma/client';
+import { PostUpdateDto } from './dto/post-update.dto';
 
 @Injectable()
 export class AdminPostsService {
@@ -43,5 +44,34 @@ export class AdminPostsService {
       skip: (page_number - 1) * page_size,
       take: page_size,
     });
+  }
+
+  async findOne(id: string): Promise<PostDbDto | null> {
+    return this.prisma.posts.findFirst({ where: { id } });
+  }
+
+  async updateOne(id: string, postUpdateDto: PostUpdateDto) {
+    return await this.prisma.users.update({
+      where: { id },
+      data: postUpdateDto,
+    });
+  }
+
+  async softDeleteOne(id: string) {
+    return await this.prisma.posts.update({
+      where: { id },
+      data: { deleted_at: new Date() },
+    });
+  }
+
+  async restoreOne(id: string) {
+    return await this.prisma.posts.update({
+      where: { id },
+      data: { deleted_at: null },
+    });
+  }
+
+  async destroyOne(id: string) {
+    return await this.prisma.posts.delete({ where: { id } });
   }
 }
