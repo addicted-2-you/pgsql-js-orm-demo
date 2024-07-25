@@ -44,7 +44,7 @@ CREATE TABLE user_phones (
 
 CREATE TABLE posts (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id UUID NOT NULL,
+  user_id UUID NOT NULL, -- TODO: rename to author_id
   title VARCHAR(255) NOT NULL,
   content TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
