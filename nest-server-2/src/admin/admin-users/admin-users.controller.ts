@@ -25,7 +25,7 @@ export class AdminUsersController {
   @Get()
   @UseGuards(AdminGuard)
   @ApiBearerAuth()
-  async getUsers(
+  async listUsers(
     @Query()
     query: UserSearchDto,
   ) {

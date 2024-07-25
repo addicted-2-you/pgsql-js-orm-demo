@@ -18,6 +18,7 @@
     - [x] search by username
       - [x] partial search
     - [x] have it paginated
+  - [ ] get one
   - [x] update password
   - [x] archive
   - [x] unarchive
@@ -37,6 +38,7 @@
         - [ ] should be case-tolerant
       - [ ] filter by `deleted_at`
       - [ ] have it paginated
+  - [ ] get one
   - [ ] archive
   - [ ] unarchive
   - [ ] destroy
