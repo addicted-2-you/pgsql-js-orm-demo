@@ -17,6 +17,7 @@ The user's feed should include
 Posts from followees should have the maximum priority, popular posts should have priority over posts from popular users.
 
 Viewed posts should go to the bottom of the list.
+
 ### The user should be able to remove any post from their feed
 
 ### The user should be able to report any post from their feed
