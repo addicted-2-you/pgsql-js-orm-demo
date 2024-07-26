@@ -18,6 +18,7 @@
     - [x] search by username
       - [x] partial search
     - [x] have it paginated
+  - [x] get one
   - [x] update password
   - [x] archive
   - [x] unarchive
@@ -25,21 +26,22 @@
 
 ## Part 3 (posts)
 
-- [ ] add post cruds (admin only)
-  - [ ] list all
-      - [ ] search by title
-        - [ ] partial search
-        - [ ] should be typo-tolerant
-        - [ ] should be case-tolerant
-      - [ ] search by content
-        - [ ] partial search
-        - [ ] should be typo-tolerant
-        - [ ] should be case-tolerant
-      - [ ] filter by `deleted_at`
-      - [ ] have it paginated
-  - [ ] archive
-  - [ ] unarchive
-  - [ ] destroy
+- [x] add post cruds (admin only)
+  - [x] list all
+      - [x] search by title
+        - [x] partial search
+        - [x] should be typo-tolerant
+        - [x] should be case-tolerant
+      - [x] search by content
+        - [x] partial search
+        - [x] should be typo-tolerant
+        - [x] should be case-tolerant
+      - [x] filter by `deleted_at`
+      - [x] have it paginated
+  - [x] get one
+  - [x] archive
+  - [x] unarchive
+  - [x] destroy
 
 
 

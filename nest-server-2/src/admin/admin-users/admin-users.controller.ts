@@ -25,11 +25,23 @@ export class AdminUsersController {
   @Get()
   @UseGuards(AdminGuard)
   @ApiBearerAuth()
-  async getUsers(
+  async listUsers(
     @Query()
     query: UserSearchDto,
   ) {
     return await this.adminUsersService.findAll(query);
+  }
+
+  @Get(':id')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  async getOne(@Param('id') id: string) {
+    const user = await this.adminUsersService.findOne(id);
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    return user;
   }
 
   @Patch(':id')
