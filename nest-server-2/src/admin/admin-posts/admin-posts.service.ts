@@ -20,30 +20,37 @@ export class AdminPostsService {
       order_direction = 'asc',
     } = params;
 
-    const where: Prisma.postsWhereInput = {};
+    const whereConditions: string[] = [];
     if (title) {
-      where.title = { contains: title, mode: 'insensitive' };
+      whereConditions.push(`similarity(title, '${title}') > 0.01`);
     }
 
     if (content) {
-      where.content = { contains: content, mode: 'insensitive' };
+      whereConditions.push(`similarity(content, '${content}') > 0.01`);
     }
 
     if (is_deleted) {
-      where.deleted_at = { not: null };
+      whereConditions.push(`deleted_at IS NOT NULL`);
+    } else {
+      whereConditions.push(`deleted_at IS NULL`);
     }
 
-    const orderBy: Prisma.postsOrderByWithRelationInput = {};
-    if (orderBy) {
-      orderBy[order_by] = order_direction;
-    }
+    const whereClause =
+      whereConditions.length > 0
+        ? `WHERE ${whereConditions.join(' AND ')}`
+        : '';
+    const orderByClause = `ORDER BY ${order_by} ${order_direction.toUpperCase()}`;
+    const offset = (page_number - 1) * page_size;
 
-    return await this.prisma.posts.findMany({
-      where,
-      orderBy,
-      skip: (page_number - 1) * page_size,
-      take: page_size,
-    });
+    const query = `
+      SELECT * FROM posts
+      ${whereClause}
+      ${orderByClause}
+      LIMIT ${page_size}
+      OFFSET ${offset}
+    `;
+
+    return await this.prisma.$queryRaw<PostDbDto[]>(Prisma.raw(query));
   }
 
   async findOne(id: string): Promise<PostDbDto | null> {

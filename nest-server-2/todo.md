@@ -30,11 +30,11 @@
   - [x] list all
       - [x] search by title
         - [x] partial search
-        - [ ] should be typo-tolerant
+        - [x] should be typo-tolerant
         - [x] should be case-tolerant
       - [x] search by content
         - [x] partial search
-        - [ ] should be typo-tolerant
+        - [x] should be typo-tolerant
         - [x] should be case-tolerant
       - [x] filter by `deleted_at`
       - [x] have it paginated
