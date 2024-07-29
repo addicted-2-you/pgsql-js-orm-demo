@@ -30,10 +30,10 @@ const {
 const { writeSql } = require("./services");
 const { withTimeMeasureAsync, withTimeMeasureSync } = require("./utils");
 
-const USERS_NUM = 500;
-const POSTS_NUM = 250;
-const COMMENTS_NUM = 1000;
-const REACTIONS_TO_POSTS_NUM = 2000;
+const USERS_NUM = 1000;
+const POSTS_NUM = USERS_NUM * 10;
+const COMMENTS_NUM = 10000;
+const REACTIONS_TO_POSTS_NUM = 20000;
 
 async function insertData() {
   try {
@@ -75,23 +75,25 @@ async function insertData() {
       createChatting
     )(users);
 
-    const sql = [
-      withTimeMeasureSync(generateInsertUsersSQL)(users),
-      withTimeMeasureSync(generateInsertUserAvatarsSQL)(avatars),
-      withTimeMeasureSync(generateInsertUserEmailsSQL)(emails),
-      withTimeMeasureSync(generateInsertUserPhonesSQL)(phones),
-      withTimeMeasureSync(generateInsertPostsSQL)(posts),
-      withTimeMeasureSync(generateInsertPostViewsSQL)(postViews),
-      withTimeMeasureSync(generateInsertPostCommentsSQL)(comments),
-      withTimeMeasureSync(generateInsertReactionsToPostsSQL)(reactionsToPosts),
-      withTimeMeasureSync(generateFriendRequestsSQL)(friendRequests),
-      withTimeMeasureSync(generateFollowingRequestsSQL)(followingRequests),
-      withTimeMeasureSync(generateChatsSQL)(chats),
-      withTimeMeasureSync(generateChatMembersSQL)(chatsMembers),
-      withTimeMeasureSync(generateMessagesSQL)(chatsMessages),
-    ].join("\n");
-
-    await withTimeMeasureAsync(writeSql)(sql);
+    await Promise.all(
+      [
+        withTimeMeasureSync(generateInsertUsersSQL)(users),
+        withTimeMeasureSync(generateInsertUserAvatarsSQL)(avatars),
+        withTimeMeasureSync(generateInsertUserEmailsSQL)(emails),
+        withTimeMeasureSync(generateInsertUserPhonesSQL)(phones),
+        withTimeMeasureSync(generateInsertPostsSQL)(posts),
+        withTimeMeasureSync(generateInsertPostViewsSQL)(postViews),
+        withTimeMeasureSync(generateInsertPostCommentsSQL)(comments),
+        withTimeMeasureSync(generateInsertReactionsToPostsSQL)(
+          reactionsToPosts
+        ),
+        withTimeMeasureSync(generateFriendRequestsSQL)(friendRequests),
+        withTimeMeasureSync(generateFollowingRequestsSQL)(followingRequests),
+        withTimeMeasureSync(generateChatsSQL)(chats),
+        withTimeMeasureSync(generateChatMembersSQL)(chatsMembers),
+        withTimeMeasureSync(generateMessagesSQL)(chatsMessages),
+      ].map((sql) => withTimeMeasureAsync(writeSql)(sql))
+    );
   } catch (err) {
     console.error(err);
   } finally {
