@@ -7,9 +7,18 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AdminUsersModule } from './admin/admin-users/admin-users.module';
 import { AdminPostsModule } from './admin/admin-posts/admin-posts.module';
+import { PostsModule } from './posts/posts.module';
+import { FeedModule } from './feed/feed.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, AdminUsersModule, AdminPostsModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    AdminUsersModule,
+    AdminPostsModule,
+    PostsModule,
+    FeedModule,
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService, UsersService],
 })

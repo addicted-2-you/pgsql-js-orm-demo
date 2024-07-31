@@ -24,6 +24,7 @@ export class AdminPostsController {
   constructor(private adminPostsService: AdminPostsService) {}
 
   @Get()
+  // TODO: reuse some auth stuff from the JwtAuthGuard
   @UseGuards(AdminGuard)
   @ApiBearerAuth()
   async listPosts(
