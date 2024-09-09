@@ -4,9 +4,9 @@
   "description": "",
   "main": "generate-data.js",
   "scripts": {
-    "db:create": "node ./db:create/index.js",
-    "db:drop-tables": "node ./db:drop-tables/index.js",
-    "db:seed": "node ./db:seed/index.js",
+    "db:create": "node ./create/index.js",
+    "db:drop-tables": "node ./drop-tables/index.js",
+    "db:seed": "node ./seed/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
